@@ -5,3 +5,4 @@ export const UserRoute = Router()
 
 UserRoute.get('/', UserController.getAll)
 UserRoute.get('/:id', UserController.getById)
+UserRoute.post('/', UserController.createUser)

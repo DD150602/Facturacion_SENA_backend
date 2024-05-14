@@ -1,5 +1,6 @@
 import db from '../config/database.js'
-import { NoData } from '../schemas/errorSchema.js'
+import { NoData, DuplicateInfo } from '../schemas/errorSchema.js'
+import bcrypt from 'bcrypt'
 
 export class UserModel {
   static async getAll () {
@@ -25,6 +26,27 @@ export class UserModel {
       WHERE id_usuario = UUID_TO_BIN(?);`, [id])
       if (!result) throw new NoData()
       return result
+    } catch (err) {
+      return err
+    }
+  }
+
+  static async createUser (input) {
+    try {
+      const { correoUsuario, passwordUsuario, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
+
+      const [[existingData]] = await db.query(`
+        SELECT numero_documento_usuario
+        FROM usuarios
+        WHERE u.correo_usuario = ? OR numero_documento_empleado = ?`, [correoUsuario, numeroDocumentoUsuario])
+      if (existingData) throw new DuplicateInfo()
+
+      const saltRounds = 10
+      const encryPassword = await bcrypt.hash(passwordUsuario, saltRounds)
+      const [usuario] = await db.query(`INSERT INTO usuarios (correo_usuario, password_usuario, estado_usuario,id_genero, id_tipo_usuario,numero_documento_usuario, primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario,telefono_usuario,direccion_usuario,fecha_nacimiento_usuario,link_foto_usuario) 
+      VALUES (?,?,1,?,?,?,?,?,?,?,?,?,?,?);
+      `, [correoUsuario, encryPassword, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, linkFoto])
+      return usuario
     } catch (err) {
       return err
     }
