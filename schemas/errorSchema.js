@@ -8,3 +8,4 @@ function ErrorFactory (name) {
 }
 
 export const NoData = ErrorFactory('There is no data')
+export const DuplicateInfo = ErrorFactory('Existing information')
