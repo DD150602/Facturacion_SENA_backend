@@ -5,5 +5,6 @@ export const UserRoute = Router()
 
 UserRoute.get('/', UserController.getAll)
 UserRoute.get('/:id', UserController.getById)
+UserRoute.get('/zona/:id', UserController.getByZone)
 UserRoute.post('/', UserController.createUser)
 UserRoute.patch('/:id', UserController.updateUser)

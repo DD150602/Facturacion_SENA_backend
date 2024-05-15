@@ -20,6 +20,16 @@ export class UserController {
     res.json(response)
   }
 
+  static async getByZone (req, res) {
+    const { id } = req.params
+    const result = validateUserById({ id })
+    if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
+    const response = await UserModel.getByZone(result.data)
+    if (response instanceof NoData) return res.status(404).json('No se han encontrado datos para cargar.')
+    if (response instanceof Error) return res.status(500).json('Error interno en el servidor')
+    return res.json(response)
+  }
+
   static async createUser (req, res) {
     const result = validateUserDataCreate(req.body)
     if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)

@@ -31,6 +31,18 @@ export class UserModel {
     }
   }
 
+  static async getByZone ({ id }) {
+    try {
+      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id,primer_nombre_usuario,primer_apellido_usuario
+      FROM usuarios
+      WHERE id_zona = (SELECT id_zona from usuarios WHERE id_usuario = UUID_TO_BIN(?));`, [id])
+      if (result.length === 0) throw new NoData()
+      return result
+    } catch (err) {
+      return err
+    }
+  }
+
   static async createUser (input) {
     try {
       const { correoUsuario, passwordUsuario, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
