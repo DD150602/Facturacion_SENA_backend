@@ -1,5 +1,5 @@
 import db from '../config/database.js'
-import { NoData, DuplicateInfo } from '../schemas/errorSchema.js'
+import { NoData, DuplicateInfo, DocumentInUse } from '../schemas/errorSchema.js'
 import bcrypt from 'bcrypt'
 
 export class UserModel {
@@ -48,6 +48,36 @@ export class UserModel {
       `, [correoUsuario, encryPassword, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, linkFoto])
       return usuario
     } catch (err) {
+      return err
+    }
+  }
+
+  static async updateUser ({ id, input }) {
+    try {
+      const { correoUsuario, idGenero, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
+
+      const [verifyEmail] = await db.query(`
+      SELECT BIN_TO_UUID(id_usuario) id 
+      FROM usuarios
+      WHERE correo_usuario = ? AND id_usuario != UUID_TO_BIN(?)`, [correoUsuario, id])
+      console.log(verifyEmail)
+      if (verifyEmail.length > 0) throw new DuplicateInfo()
+
+      const [verifyUser] = await db.query(`
+      SELECT BIN_TO_UUID(id_usuario) id 
+      FROM empleados
+      WHERE numero_documento_usuario = ? AND id_usuario != UUID_TO_BIN(?)`, [numeroDocumentoUsuario, id])
+
+      if (verifyUser.length > 0) throw new DocumentInUse()
+
+      const [res] = await db.query(`
+      UPDATE usuarios
+      SET primer_nombre_usuario = ?, segundo_nombre_usuario = ?, primer_apellido_usuario = ?, segundo_apellido_usuario = ?, correo_usuario = ?, numero_documento_usuario = ?, id_genero =?, link_foto_usuario =?, telefono_usuario = ?, direccion_usuario=?, fecha_nacimiento_usuario = ? 
+      WHERE id_empleado = UUID_TO_BIN(?)`,
+      [primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, correoUsuario, numeroDocumentoUsuario, idGenero, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, id])
+      return res
+    } catch (err) {
+      console.log(err)
       return err
     }
   }
