@@ -25,11 +25,11 @@ export class UserController {
     if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
     const response = await UserModel.createUser(result.data)
     if (response instanceof DuplicateInfo) {
-      res.status(400).json({ message: 'el usuario o empleado ya esta registrado' })
+      res.status(400).json({ message: 'El usuario ya esta registrado' })
     } else if (response instanceof Error) {
       res.status(500).json({ message: 'Error interno del servidor ' })
     } else {
-      res.json({ message: 'Empleado creado exitosamente' })
+      res.json({ message: 'Usuario creado exitosamente' })
     }
   }
 
