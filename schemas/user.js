@@ -81,6 +81,11 @@ const userUpdateSchema = z.object({
   })
 })
 
+const UserDeleteSchema = z.object({
+  anotacion: z.string().min(1, 'El campo de anotación no puede estar vacío'),
+  idUserRemplazo: z.string({ message: 'El dato enviado no es valido.' }).min(1, { message: 'El valor no puede estar vacio.' }).uuid({ message: 'No se ha proporcionado un UUID valido.' })
+})
+
 export function validateUserById (input) {
   return UserSchemaById.safeParse(input)
 }
@@ -91,4 +96,8 @@ export function validateUserDataCreate (input) {
 
 export function validateUserDataUpdate (input) {
   return userUpdateSchema.safeParse(input)
+}
+
+export function validateUserDelete (input) {
+  return UserDeleteSchema.safeParse(input)
 }

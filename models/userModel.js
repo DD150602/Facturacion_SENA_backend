@@ -1,5 +1,5 @@
 import db from '../config/database.js'
-import { NoData, DuplicateInfo, DocumentInUse } from '../schemas/errorSchema.js'
+import { NoData, DuplicateInfo, DocumentInUse, AccountAlreadyDisable, ActionNotAllowed } from '../schemas/errorSchema.js'
 import bcrypt from 'bcrypt'
 
 export class UserModel {
@@ -90,6 +90,41 @@ export class UserModel {
       return res
     } catch (err) {
       console.log(err)
+      return err
+    }
+  }
+
+  static async deleteUser ({ id, input }) {
+    try {
+      const { anotacion, idUserRemplazo } = input
+
+      const [[estadoCuenta]] = await db.query(`SELECT estado_usuario FROM usuarios 
+      WHERE id_usuario = UUID_TO_BIN(?);`, [id])
+      if (!estadoCuenta) throw new NoData()
+      if (estadoCuenta.estado_usuario !== 1) throw new AccountAlreadyDisable()
+
+      const [[conteoCuentas]] = await db.query(`SELECT COUNT(id_tipo_usuario) AS cuentas_existentes 
+      FROM usuarios
+      WHERE id_tipo_usuario = (SELECT id_tipo_usuario FROM usuarios
+        WHERE id_usuario = UUID_TO_BIN(?)) AND estado_usuario = 1;`, [id])
+
+      if (conteoCuentas.cuentas_existentes === 1) throw new ActionNotAllowed()
+
+      await db.beginTransaction()
+
+      const [res] = await db.query(`UPDATE usuarios 
+      SET usuarios.estado_usuario = 0, usuarios.fecha_eliminacion_usuario = CURDATE(), usuarios.anotacion_usuario = ?
+      WHERE id_usuario = UUID_TO_BIN(?);`,
+      [anotacion, id])
+
+      await db.query(`UPDATE facturas
+      SET id_usuario = UUID_TO_BIN(?) 
+      WHERE id_usuario = UUID_TO_BIN(?)`, [idUserRemplazo, id])
+
+      await db.commit()
+      return res
+    } catch (err) {
+      await db.rollback()
       return err
     }
   }
