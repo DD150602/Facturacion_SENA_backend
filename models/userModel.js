@@ -128,4 +128,24 @@ export class UserModel {
       return err
     }
   }
+
+  static async getUserType () {
+    try {
+      const [res] = await db.query('SELECT id_tipo_usuario as id, descripcion_usuario as value FROM tipo_usuario')
+      if (res.length === 0) throw new NoData()
+      return res
+    } catch (err) {
+      return err
+    }
+  }
+
+  static async getGenreTypes () {
+    try {
+      const [res] = await db.query('SELECT id_genero AS id, genero AS value FROM genero;')
+      if (res.length === 0) throw new NoData()
+      return res
+    } catch (error) {
+      return error
+    }
+  }
 }

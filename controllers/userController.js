@@ -73,4 +73,18 @@ export class UserController {
     if (response instanceof Error) return res.status(500).json({ message: 'Error interno del servidor' })
     res.json({ message: 'Usuario desactivado satisfactoriamente' })
   }
+
+  static async getUserType (req, res) {
+    const response = await UserModel.getUserType()
+    if (response instanceof NoData) return res.status(404).json({ message: 'No hay datos de tipos de usuarios que cargar' })
+    if (response instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
+    res.json(response)
+  }
+
+  static async getGenreTypes (req, res) {
+    const response = await UserModel.getGenreTypes()
+    if (response instanceof NoData) return res.status(404).json({ message: 'No hay generos existentes' })
+    if (response instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
+    res.json(response)
+  }
 }
