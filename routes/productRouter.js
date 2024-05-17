@@ -7,5 +7,6 @@ productRouter.get('/', ProductController.getAllProducts)
 productRouter.get('/:id', ProductController.getProductsById)
 productRouter.post('/', ProductController.createProduct)
 productRouter.patch('/:id', ProductController.updateProduct)
+productRouter.patch('/desable/:id', ProductController.deleteProduct)
 
 export default productRouter

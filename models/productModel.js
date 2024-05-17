@@ -4,7 +4,13 @@ import { NoData } from '../schemas/errorSchema.js'
 export default class ProductModel {
   static async getAllProducts () {
     try {
-      const [res] = await db.query('SELECT id_producto, nombre_producto, descripcion_producto, valor_producto, link_foto_producto FROM productos')
+      const [res] = await db.query(
+        `
+        SELECT id_producto, nombre_producto, descripcion_producto, valor_producto, link_foto_producto 
+        FROM productos
+        WHERE estado_producto = 1
+        `
+      )
       if (!res) return new NoData()
       if (res.length === 0) return new NoData()
       return res
@@ -15,7 +21,12 @@ export default class ProductModel {
 
   static async getProductsById (id) {
     try {
-      const [res] = await db.query('SELECT id_producto, nombre_producto, descripcion_producto, valor_producto, link_foto_producto FROM productos WHERE id_producto = ?', [id])
+      const [res] = await db.query(
+        `
+        SELECT id_producto, nombre_producto, descripcion_producto, valor_producto, link_foto_producto 
+        FROM productos 
+        WHERE estado_producto = 1 AND id_producto = ?`, [id]
+      )
       if (!res) return new NoData()
       if (res.length === 0) return new NoData()
       return res
@@ -46,6 +57,17 @@ export default class ProductModel {
 
       return 'actualizado con exito'
     } catch (error) {
+      return error
+    }
+  }
+
+  static async deleteProduct ({ id, input }) {
+    try {
+      const { anotacion } = input
+      await db.query('UPDATE productos SET estado_producto = 0, anotacion_producto = ? WHERE id_producto = ?', [anotacion, id])
+      return 'eliminado con exito'
+    } catch (error) {
+      console.log(error)
       return error
     }
   }
