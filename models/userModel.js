@@ -35,7 +35,7 @@ export class UserModel {
     try {
       const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id,primer_nombre_usuario,primer_apellido_usuario
       FROM usuarios
-      WHERE id_zona = (SELECT id_zona from usuarios WHERE id_usuario = UUID_TO_BIN(?));`, [id])
+      WHERE id_zona = (SELECT id_zona from usuarios WHERE id_usuario = UUID_TO_BIN(?)) AND estado_usuario=1;`, [id])
       if (result.length === 0) throw new NoData()
       return result
     } catch (err) {
@@ -46,11 +46,10 @@ export class UserModel {
   static async createUser (input) {
     try {
       const { correoUsuario, passwordUsuario, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
-
       const [[existingData]] = await db.query(`
         SELECT numero_documento_usuario
         FROM usuarios
-        WHERE u.correo_usuario = ? OR numero_documento_empleado = ?`, [correoUsuario, numeroDocumentoUsuario])
+        WHERE correo_usuario = ? OR numero_documento_usuario = ?`, [correoUsuario, numeroDocumentoUsuario])
       if (existingData) throw new DuplicateInfo()
 
       const saltRounds = 10
@@ -77,7 +76,7 @@ export class UserModel {
 
       const [verifyUser] = await db.query(`
       SELECT BIN_TO_UUID(id_usuario) id 
-      FROM empleados
+      FROM usuarios
       WHERE numero_documento_usuario = ? AND id_usuario != UUID_TO_BIN(?)`, [numeroDocumentoUsuario, id])
 
       if (verifyUser.length > 0) throw new DocumentInUse()
@@ -85,7 +84,7 @@ export class UserModel {
       const [res] = await db.query(`
       UPDATE usuarios
       SET primer_nombre_usuario = ?, segundo_nombre_usuario = ?, primer_apellido_usuario = ?, segundo_apellido_usuario = ?, correo_usuario = ?, numero_documento_usuario = ?, id_genero =?, link_foto_usuario =?, telefono_usuario = ?, direccion_usuario=?, fecha_nacimiento_usuario = ? 
-      WHERE id_empleado = UUID_TO_BIN(?)`,
+      WHERE id_usuario = UUID_TO_BIN(?)`,
       [primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, correoUsuario, numeroDocumentoUsuario, idGenero, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, id])
       return res
     } catch (err) {
@@ -116,15 +115,17 @@ export class UserModel {
       SET usuarios.estado_usuario = 0, usuarios.fecha_eliminacion_usuario = CURDATE(), usuarios.anotacion_usuario = ?
       WHERE id_usuario = UUID_TO_BIN(?);`,
       [anotacion, id])
-
-      await db.query(`UPDATE facturas
+      if (idUserRemplazo !== '') {
+        await db.query(`UPDATE facturas
       SET id_usuario = UUID_TO_BIN(?) 
       WHERE id_usuario = UUID_TO_BIN(?)`, [idUserRemplazo, id])
+      }
 
       await db.commit()
       return res
     } catch (err) {
       await db.rollback()
+      console.log(err)
       return err
     }
   }
