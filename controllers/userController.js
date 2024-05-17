@@ -51,7 +51,7 @@ export class UserController {
     const result = validateUserDataUpdate(req.body)
     if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
 
-    const response = await UserModel.updateUser({ id: resultId.data, input: result.data })
+    const response = await UserModel.updateUser({ id: resultId.data.id, input: result.data })
     if (response instanceof DuplicateInfo) return res.status(409).json({ message: 'El correo electronico ya se encuentra en uso' })
     if (response instanceof DocumentInUse) return res.status(404).json({ message: 'El numero de documento ya se encuentra en uso' })
     if (response instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
@@ -66,7 +66,7 @@ export class UserController {
     const result = validateUserDelete(req.body)
     if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
 
-    const response = await UserModel.deleteUser({ id: resultId.data, input: result.data })
+    const response = await UserModel.deleteUser({ id: resultId.data.id, input: result.data })
     if (response instanceof AccountAlreadyDisable) return res.status(409).json({ message: 'El Usuario ya ha sido desabilitado' })
     if (response instanceof NoData) return res.status(404).json({ message: 'Usuario no registrado' })
     if (response instanceof ActionNotAllowed) return res.status(409).json({ message: 'No se puede deshabilitar este usuario ya que no existen otros de este tipo en el sistema' })
