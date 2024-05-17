@@ -1,15 +1,20 @@
 import z from 'zod'
 
 const UserSchemaById = z.object({
-  id: z.string({ message: 'El dato enviado no es valido.' }).min(1, { message: 'El valor no puede estar vacio.' }).uuid({ message: 'No se ha proporcionado un UUID valido.' })
+  id: z.string({ message: 'El dato enviado no es valido.' }).min(1, { message: 'El valor no puede estar vacio.' }).uuid({ message: 'No se ha proporcionado un ID valido.' })
 })
 
 const userCreateSchema = z.object({
   primerNombreUsuario: z.string()
     .min(1, { message: 'El primer nombre del usuario no puede estar vacío.' })
     .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El primer nombre del usaurio no puede contener caracteres especiales.' }),
-  segundoNombreUsuario: z.string({ message: 'El segundo nombre del usuario tiene que ser texto.' })
-    .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El segundo nombre del usuario no puede contener caracteres especiales.' }),
+  segundoNombreUsuario: z.string({
+    message: 'El segundo nombre del usuario tiene que ser texto.'
+  })
+    .optional()
+    .refine(value => value === undefined || value === '' || /^[a-zA-Z]+$/.test(value), {
+      message: 'El segundo nombre del usuario no puede contener caracteres especiales.'
+    }),
   primerApellidoUsuario: z.string()
     .min(1, { message: 'El primer apellido del usuario no puede estar vacío.' })
     .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El primer apellido del usuario no puede contener caracteres especiales.' }),
@@ -32,7 +37,7 @@ const userCreateSchema = z.object({
     const colombianAddressRegex = /^.*\b(calle|carrera|avenida|diagonal|transversal|manzana|mz|avenida carrera|vía)\b.*/gi
     return colombianAddressRegex.test(value)
   }, 'La direccion tiene un formato invalido'),
-  fechanacimientoUsuario: z.union([z.string().nullable(), z.null()]).refine(value => {
+  fechaNacimientoUsuario: z.union([z.string().nullable(), z.null()]).refine(value => {
     if (value === null) return true
     if (typeof value === 'string') {
       return /^\d{4}-\d{2}-\d{2}$/.test(value)
@@ -40,15 +45,21 @@ const userCreateSchema = z.object({
     return value instanceof Date
   }, {
     message: 'La fecha de nacimiento debe ser una cadena en formato YYYY-MM-DD'
-  })
+  }),
+  linkFoto: z.string().optional()
 })
 
 const userUpdateSchema = z.object({
   primerNombreUsuario: z.string()
     .min(1, { message: 'El primer nombre del usuario no puede estar vacío.' })
     .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El primer nombre del usaurio no puede contener caracteres especiales.' }),
-  segundoNombreUsuario: z.string({ message: 'El segundo nombre del usuario tiene que ser texto.' })
-    .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El segundo nombre del usuario no puede contener caracteres especiales.' }),
+  segundoNombreUsuario: z.string({
+    message: 'El segundo nombre del usuario tiene que ser texto.'
+  })
+    .optional()
+    .refine(value => value === undefined || value === '' || /^[a-zA-Z]+$/.test(value), {
+      message: 'El segundo nombre del usuario no puede contener caracteres especiales.'
+    }),
   primerApellidoUsuario: z.string()
     .min(1, { message: 'El primer apellido del usuario no puede estar vacío.' })
     .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El primer apellido del usuario no puede contener caracteres especiales.' }),
@@ -70,7 +81,7 @@ const userUpdateSchema = z.object({
     const colombianAddressRegex = /^.*\b(calle|carrera|avenida|diagonal|transversal|manzana|mz|avenida carrera|vía)\b.*/gi
     return colombianAddressRegex.test(value)
   }, 'La direccion tiene un formato invalido'),
-  fechanacimientoUsuario: z.union([z.string().nullable(), z.null()]).refine(value => {
+  fechaNacimientoUsuario: z.union([z.string().nullable(), z.null()]).refine(value => {
     if (value === null) return true
     if (typeof value === 'string') {
       return /^\d{4}-\d{2}-\d{2}$/.test(value)
@@ -78,12 +89,13 @@ const userUpdateSchema = z.object({
     return value instanceof Date
   }, {
     message: 'La fecha de nacimiento debe ser una cadena en formato YYYY-MM-DD'
-  })
+  }),
+  linkFoto: z.string().optional()
 })
 
 const UserDeleteSchema = z.object({
   anotacion: z.string().min(1, 'El campo de anotación no puede estar vacío'),
-  idUserRemplazo: z.string({ message: 'El dato enviado no es valido.' }).min(1, { message: 'El valor no puede estar vacio.' }).uuid({ message: 'No se ha proporcionado un UUID valido.' })
+  idUserRemplazo: z.string({ message: 'El dato enviado no es valido.' }).uuid({ message: 'No se ha proporcionado un ID valido.' }).optional()
 })
 
 export function validateUserById (input) {
