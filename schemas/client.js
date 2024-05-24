@@ -1,7 +1,10 @@
 import z from 'zod'
 
-const UserSchemaById = z.object({
-  id: z.string({ message: 'El dato enviado no es valido.' }).min(1, { message: 'El valor no puede estar vacio.' }).uuid({ message: 'No se ha proporcionado un ID valido.' })
+const ClientById = z.object({
+  numeroDocumentoClient: z.string()
+    .min(7, { message: 'El número de documento del cliente debe tener entre 7 y 10 caracteres.' })
+    .max(10, { message: 'El número de documento del cliente debe tener entre 7 y 10 caracteres.' })
+    .refine(value => /^[a-zA-Z0-9]+$/.test(value), { message: 'El número de documento del cliente no puede contener caracteres especiales.' })
 })
 
 const clientCreateSchema = z.object({
@@ -39,8 +42,8 @@ const clientCreateSchema = z.object({
   idZona: z.string({ message: 'El ID de zona enviado no es valido.' }).min(1, { message: 'El valor ID de zona no puede estar vacio.' }).uuid({ message: 'No se ha proporcionado un ID de zona valido.' })
 })
 
-export function validateUserById (input) {
-  return UserSchemaById.safeParse(input)
+export function validateClientById (input) {
+  return ClientById.safeParse(input)
 }
 
 export function validateClientDataCreate (input) {

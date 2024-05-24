@@ -1,7 +1,18 @@
 import db from '../config/database.js'
-import { DuplicateInfo } from '../schemas/errorSchema.js'
+import { DuplicateInfo, NoData } from '../schemas/errorSchema.js'
 
 export class ClientModel {
+  static async verifyClient ({ numeroDocumentoClient }) {
+    try {
+      const [[data]] = await db.query(`SELECT correo_cliente, numero_documento_cliente, primer_nombre_cliente, segundo_nombre_cliente, primer_apellido_cliente, segundo_apellido_cliente,telefono_cliente FROM clientes
+      WHERE numero_documento_cliente = ?`, [numeroDocumentoClient])
+      if (!data) throw new NoData()
+      return data
+    } catch (error) {
+      return error
+    }
+  }
+
   static async createClient (input) {
     try {
       const { correoClient, idGenero, numeroDocumentoClient, primerNombreClient, segundoNombreClient, primerApellidoClient, segundoApellidoClient, linkFoto, telefonoClient, direccionClient, idZona } = input
