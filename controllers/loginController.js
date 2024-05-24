@@ -9,7 +9,7 @@ class AuthController {
             const validacion = loginSchema.safeParse(req.body);
 
             if (!validacion.success) {
-                return res.status(400).json({ error: validacion.error.errors });
+                return res.status(400).json({ message: JSON.parse(validacion.error.message)[0].message })
             }
 
             const { correo_usuario, password_usuario } = validacion.data;

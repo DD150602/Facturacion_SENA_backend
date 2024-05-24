@@ -1,6 +1,6 @@
-function ErrorFactory (name) {
+function ErrorFactory(name) {
   return class BusinessError extends Error {
-    constructor (message) {
+    constructor(message) {
       super(message)
       this.name = name
     }
@@ -8,3 +8,4 @@ function ErrorFactory (name) {
 }
 
 export const NoData = ErrorFactory('There is no data')
+export const NotFoundUser = ErrorFactory('User not found')
