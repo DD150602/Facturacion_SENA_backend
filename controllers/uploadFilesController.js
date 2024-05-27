@@ -4,10 +4,7 @@ export class UploadFilesControler {
     const { files } = req
     if (!files) return res.status(400).json({ message: 'No se ha cargado ningun archivo' })
     const response = await UploadFilesModel.uploadFiles(files, 'photos_profile')
-    if (response instanceof Error) {
-      res.status(500).json({ message: 'Error en el servidor' })
-    } else {
-      res.json({ link: response })
-    }
+    if (response instanceof Error) return res.status(500).json({ message: 'Error en el servidor' })
+    return res.json({ link: response })
   }
 }
