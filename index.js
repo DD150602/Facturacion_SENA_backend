@@ -6,7 +6,8 @@ import corsMiddleware from './middlewares/cors.middleware.js'
 import { UserRoute } from './routes/userRoutes.js'
 import productRouter from './routes/productRoutes.js'
 import { ClientRoute } from './routes/clientRoutes.js'
-import { uploadRouter } from './routes/uploadFilesRoutes.js'import repoteVentasRouter from './routes/reporteVentasRouter.js'
+import { uploadRouter } from './routes/uploadFilesRoutes.js'
+import repoteVentasRouter from './routes/reporteVentasRouter.js'
 
 const app = express()
 app.use(corsMiddleware())
