@@ -17,4 +17,23 @@ export default class ReporteVentasModel {
       return error
     }
   }
+
+  static async getInfoForReport (id) {
+    try {
+      const [[info]] = await db.query(
+        `SELECT CONCAT_WS(' ', primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario) AS nombre_usuario,correo_usuario, telefono_usuario, id_factura, CONCAT_WS(' ', primer_nombre_usuario, primer_apellido_usuario) AS nombre_cliente, correo_cliente, valor_neto_factura
+        FROM usuarios
+        INNER JOIN facturas ON usuarios.id_usuario = facturas.id_usuario
+        INNER JOIN clientes ON facturas.id_cliente = clientes.id_cliente
+        WHERE usuarios.id_usuario = UUID_TO_BIN(?)`, [id]
+      )
+
+      if (!info) throw new NoData()
+      if (info.length === 0) throw new NoData()
+
+      return info
+    } catch (error) {
+      return error
+    }
+  }
 }
