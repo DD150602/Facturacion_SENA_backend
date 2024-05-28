@@ -6,12 +6,11 @@ const UserSchemaById = z.object({
 
 // Esquema de validación para la creación de una factura
 const createInvoiceSchema = z.object({
-  idFactura: z.string().uuid(),
   valorBrutoFactura: z.number().positive(),
   valorNetoFactura: z.number().positive(),
   cantidadCuotasFactura: z.number().int().positive(),
   cuotaActualFactura: z.number().int().positive(),
-  fechaProximoPago: z.date(),
+  fechaProximoPago: z.string(),
   idUsuario: z.string().uuid(),
   idCliente: z.string().uuid(),
   idTipoCuota: z.number().int().positive(),
