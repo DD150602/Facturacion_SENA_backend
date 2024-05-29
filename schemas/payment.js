@@ -20,7 +20,7 @@ const CreatePayment = z.object({
     .positive({ message: 'El campo valor cuota debe ser un número positivo' })
     .gt(0, { message: 'El campo valor cuota debe ser mayor que 0' }),
 
-  idFactura: z.string()
+  idFactura: z.string({ message: 'El Id de la factura no puede estar vacio' })
     .min(3, { message: 'El identificador de la factura debe tener al menos 3 caracteres' })
     .regex(/^[A-Za-z0-9-]+$/, { message: 'El identificador de la factura solo puede contener caracteres alfanuméricos y guiones' }),
 
