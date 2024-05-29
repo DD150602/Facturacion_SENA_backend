@@ -1,7 +1,8 @@
 import cors from 'cors'
 
 const ACCPEPTED_ORIGINS = [
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://localhost:5173'
 ]
 
 export default function corsMiddleware ({ acceptedOrigins = ACCPEPTED_ORIGINS } = {}) {
