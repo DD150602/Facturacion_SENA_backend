@@ -1,6 +1,6 @@
 import db from '../config/database.js'
 import { NoData } from '../schemas/errorSchema.js'
-
+import transporter from '../config/connectionEmail.js'
 export class InvoiceModel {
   static async getAll () {
     try {
@@ -60,6 +60,43 @@ export class InvoiceModel {
       await db.rollback()
       console.log(err)
       return err
+    }
+  }
+
+  static async sendFactura (input) {
+    const { nombreUsuario, apellidoUsuario, correoUsuario, link } = input
+    try {
+      const mailOptions = {
+        from: 'samivazqueles@gmail.com',
+        to: `${correoUsuario}`,
+        subject: 'Factura Disponible',
+        html: `
+          <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #F3F4F6; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <i class="fas fa-dog" style="color: #4CAF50; font-size: 48px;"></i>
+            </div>
+            <h2 style="color: #333; font-size: 18px; margin-bottom: 10px;">
+              <strong>Nombre del cliente:</strong> Hola ${nombreUsuario} ${apellidoUsuario},
+            </h2>
+            <p style="color: #333; font-size: 16px; margin-bottom: 10px;">
+              Tu factura ya está disponible. Puedes acceder a través del siguiente enlace:
+            </p>
+            <p style="text-align: center;">
+              <a href="${link}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">Ver Factura</a>
+            </p>
+          </div>
+        `
+      }
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error)
+        } else {
+          console.log('Correo electrónico enviado: ' + info.response)
+        }
+      })
+    } catch (error) {
+      console.error('Error al enviar el correo electrónico:', error)
     }
   }
 }
