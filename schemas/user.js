@@ -37,15 +37,7 @@ const userCreateSchema = z.object({
     const colombianAddressRegex = /^.*\b(calle|carrera|avenida|diagonal|transversal|manzana|mz|avenida carrera|vía)\b.*/gi
     return colombianAddressRegex.test(value)
   }, 'La direccion tiene un formato invalido'),
-  fechaNacimientoUsuario: z.union([z.string().nullable(), z.null()]).refine(value => {
-    if (value === null) return true
-    if (typeof value === 'string') {
-      return /^\d{4}-\d{2}-\d{2}$/.test(value)
-    }
-    return value instanceof Date
-  }, {
-    message: 'La fecha de nacimiento debe ser una cadena en formato YYYY-MM-DD'
-  }),
+  fechaNacimientoUsuario: z.string('La fecha de nacimiento debe ser una cadena de texto').date('La fecha de nacimiento no tiene un formato valido'),
   linkFoto: z.string().optional()
 })
 
