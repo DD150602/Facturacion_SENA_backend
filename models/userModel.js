@@ -19,7 +19,7 @@ export class UserModel {
   static async getById ({ id }) {
     try {
       const [[result]] = await db.query(`
-      SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario,primer_nombre_usuario,segundo_nombre_usuario,primer_apellido_usuario,segundo_apellido_usuario,correo_usuario,usuarios.estado_usuario,tipo_usuario.descripcion_usuario,tipo_usuario.id_tipo_usuario,genero.id_genero, link_foto_usuario, telefono_usuario,direccion_usuario,fecha_nacimiento_usuario
+      SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario as numeroDocumentoUsuario ,primer_nombre_usuario as primerNombreUsuario,segundo_nombre_usuario as segundoNombreUsuario,primer_apellido_usuario as primerApellidoUsuario,segundo_apellido_usuario as segundoApellidoUsuario,correo_usuario as correoUsuario,genero.id_genero as idGenero, link_foto_usuario as linkFoto, telefono_usuario as telefonoUsuario,direccion_usuario as direccionUsuario,DATE_FORMAT(fecha_nacimiento_usuario, '%Y-%m-%d') AS fechaNacimientoUsuario
       FROM usuarios
       INNER JOIN tipo_usuario ON usuarios.id_tipo_usuario = tipo_usuario.id_tipo_usuario
       INNER JOIN genero ON genero.id_genero = usuarios.id_genero
