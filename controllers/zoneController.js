@@ -32,8 +32,6 @@ export default class zoneController{
   static async updatedZone (req, res){
     const { id } = req.params
     const updata = validateZonaUpdate(req.body)
-  
-
     if(!updata.success){
       return res.status(400).json({ message: JSON.parse(updata.error.message)[0].message })
     }
@@ -84,6 +82,8 @@ export default class zoneController{
       res.json(response)
     }
   }
+   
+  };
   
 }
 

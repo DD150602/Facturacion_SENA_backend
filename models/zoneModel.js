@@ -41,6 +41,7 @@ export default class zoneModel {
       if(insert.length === 0) return new NoData()
       return insert
     }catch (error){
+
       return error 
     }
   }
@@ -95,7 +96,10 @@ static async addUserZone(id, zonaId){
   }
 }
 
+}
+      console.log(error)
+      return error
+    }
 
-
-
+  }
 }
