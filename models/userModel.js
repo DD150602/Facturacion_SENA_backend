@@ -33,7 +33,7 @@ export class UserModel {
 
   static async getByZone ({ id }) {
     try {
-      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id,primer_nombre_usuario,primer_apellido_usuario
+      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id,CONCAT_WS(' ',primer_nombre_usuario,primer_apellido_usuario) AS value
       FROM usuarios
       WHERE id_zona = (SELECT id_zona from usuarios WHERE id_usuario = UUID_TO_BIN(?)) AND estado_usuario=1;`, [id])
       if (result.length === 0) throw new NoData()
