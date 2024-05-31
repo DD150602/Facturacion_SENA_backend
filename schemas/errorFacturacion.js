@@ -15,9 +15,6 @@ const createInvoiceSchema = z.object({
   cantidadCuotasFactura: z.number({ message: 'La cantidad de cuotas no es valida.' })
     .int({ message: 'La cantidad de cuotas debe ser un número entero.' })
     .positive({ message: 'La cantidad de cuotas debe ser positiva.' }),
-  cuotaActualFactura: z.number({ message: 'La cuota actual no es valida.' })
-    .int({ message: 'La cuota actual debe ser un número entero.' })
-    .positive({ message: 'La cuota actual debe ser positiva.' }),
   fechaProximoPago: z.string({ message: 'La fecha del próximo pago no es valida.' }),
   idUsuario: z.string({ message: 'El ID del usuario no es valido.' })
     .uuid({ message: 'No se ha proporcionado un ID de usuario valido.' }),
