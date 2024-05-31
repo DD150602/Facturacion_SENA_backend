@@ -32,7 +32,7 @@ export class UserController {
 
   static async createUser (req, res) {
     const result = validateUserDataCreate(req.body)
-    if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
+    if (!result.success) return res.status(400).json({ objectError: result.error.errors })
     const response = await UserModel.createUser(result.data)
     if (response instanceof DuplicateInfo) {
       res.status(400).json({ message: 'El usuario ya esta registrado' })
