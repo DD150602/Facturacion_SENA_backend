@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 export class UserModel {
   static async getAll () {
     try {
-      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario,primer_nombre_usuario,primer_apellido_usuario,correo_usuario,telefono_usuario,estado_usuario FROM usuarios
+      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario,CONCAT_WS(' ',primer_nombre_usuario,primer_apellido_usuario) nombre_usuario,correo_usuario,telefono_usuario,estado_usuario FROM usuarios
       WHERE id_tipo_usuario = 2`)
       if (result.length === 0) {
         throw new NoData()
