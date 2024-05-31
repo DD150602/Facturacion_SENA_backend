@@ -32,7 +32,6 @@ export default class zoneController{
   static async updatedZone (req, res){
     const { id } = req.params
     const updata = validateZonaUpdate(req.body)
-
     if(!updata.success){
       return res.status(400).json({ message: JSON.parse(updata.error.message)[0].message })
     }
@@ -48,6 +47,41 @@ export default class zoneController{
   
   
   static async addUserToZone(req, res){
+    const { id } = req.params
+    const zonaId = req.body.id[0]
+    const response = await ZoneModel.addUserZone(id, zonaId)
+    if (response instanceof NoData) {
+      res.status(400).json({ message: 'No se encontro al usuario para vincular' })
+    } else if (response instanceof Error) {
+      res.status(500).json({ message: 'Error interno del servidor ' })
+    } else {
+      res.json({ message: 'Vinculacion exitosa' })
+    }
+  };
+
+  static async getUserById(req, res){
+    const { id } = req.params
+    const response = await ZoneModel.getUser(id)
+    if(response instanceof NoData){
+        res.status(404).json({ message: 'El usuario no eviste' })
+      } else if (response instanceof Error){
+        res.status(500).json({ message: 'Error en el servidor' })
+      } else{
+        res.json(response)
+      }
+  }
+
+  static async getZonaById(req, res){
+    const { id } = req.params
+    const response = await ZoneModel.getZoneByID(id)
+    if(response instanceof NoData){
+      res.status(404).json({ message: 'No hay zonas registradas' })
+    } else if (response instanceof Error){
+      res.status(500).json({ message: 'Error en el servidor' })
+    } else{
+      res.json(response)
+    }
+  }
    
   };
   
