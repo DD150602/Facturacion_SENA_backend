@@ -31,6 +31,16 @@ export class InvoiceModel {
     }
   }
 
+  static async getTipoCuota () {
+    try {
+      const [response] = await db.query(`
+      select id_tipo_cuota , descripcion_cuota from tipo_cuotas`)
+      return response
+    } catch (error) {
+      return error
+    }
+  }
+
   static async createInvoice (input) {
     const { valorBrutoFactura, valorNetoFactura, cantidadCuotasFactura, fechaProximoPago, idUsuario, idCliente, idTipoCuota, productosFacturas } = input
     try {
