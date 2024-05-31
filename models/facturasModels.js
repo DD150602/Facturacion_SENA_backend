@@ -34,7 +34,7 @@ export class InvoiceModel {
   static async getTipoCuota () {
     try {
       const [response] = await db.query(`
-      select id_tipo_cuota , descripcion_cuota from tipo_cuotas`)
+      select id_tipo_cuota as id , descripcion_cuota as value from tipo_cuotas`)
       return response
     } catch (error) {
       return error
