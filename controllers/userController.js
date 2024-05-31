@@ -49,7 +49,7 @@ export class UserController {
     if (!resultId.success) return res.status(400).json(`${JSON.parse(resultId.error.message)[0].message}`)
 
     const result = validateUserDataUpdate(req.body)
-    if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
+    if (!result.success) return res.status(400).json({ objectError: result.error.errors })
 
     const response = await UserModel.updateUser({ id: resultId.data.id, input: result.data })
     if (response instanceof DuplicateInfo) return res.status(409).json({ message: 'El correo electronico ya se encuentra en uso' })
@@ -64,7 +64,7 @@ export class UserController {
     if (!resultId.success) return res.status(400).json(`${JSON.parse(resultId.error.message)[0].message}`)
 
     const result = validateUserDelete(req.body)
-    if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
+    if (!result.success) return res.status(400).json({ objectError: result.error.errors })
 
     const response = await UserModel.deleteUser({ id: resultId.data.id, input: result.data })
     if (response instanceof AccountAlreadyDisable) return res.status(409).json({ message: 'El Usuario ya ha sido desabilitado' })
