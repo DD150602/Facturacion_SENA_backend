@@ -77,8 +77,8 @@ const userUpdateSchema = z.object({
 })
 
 const UserDeleteSchema = z.object({
-  anotacion: z.string().min(1, 'El campo de anotación no puede estar vacío'),
-  idUserRemplazo: z.string({ message: 'El dato enviado no es valido.' }).uuid({ message: 'No se ha proporcionado un ID valido.' }).optional()
+  anotacion: z.string({ message: 'El dato enviado no es valido.' }).min(1, 'El campo de anotación no puede estar vacío'),
+  idUserRemplazo: z.string({ message: 'El dato enviado no es valido.' }).uuid({ message: 'No se ha proporcionado un ID valido.' })
 })
 
 export function validateUserById (input) {
