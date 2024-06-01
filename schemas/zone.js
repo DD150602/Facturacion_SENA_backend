@@ -1,29 +1,23 @@
-import z from 'zod';
-
-const noNumbersRegex = /^[^0-9]*$/;
+import z from 'zod'
 
 const zoneCreate = z.object({
-    nombreZona: z.string({ message: 'El nombre debe ser una cadena de texto' })
-        .min(1, { message: 'El campo no puede estar vacio' })
-        .refine(val => noNumbersRegex.test(val), { message: 'El nombre no debe contener números' }),
-    descripcionZona: z.string({ message: 'Esta descripción debe ser una cadena de texto' })
-        .min(1, { message: 'El campo no puede estar vacio' })
-        .refine(val => noNumbersRegex.test(val), { message: 'La descripción no debe contener números' })
-});
+  nombreZona: z.string({ message: 'El nombre debe ser una cadena de texto' })
+    .min(1, { message: 'El campo no puede estar vacio' }),
+  descripcionZona: z.string({ message: 'Esta descripción debe ser una cadena de texto' })
+    .min(1, { message: 'El campo no puede estar vacio' })
+})
 
-export function validateZona(zone) {
-    return zoneCreate.safeParse(zone);
+export function validateZona (zone) {
+  return zoneCreate.safeParse(zone)
 }
 
 const zoneUpdate = z.object({
-    nombreZona: z.string({ message: 'El nombre debe ser una cadena de texto' })
-        .optional()
-        .refine(val => val === undefined || (val.length > 0 && noNumbersRegex.test(val)), { message: 'El nombre no debe estar vacío y no debe contener números' }),
-    descripcionZona: z.string({ message: 'Esta descripción debe ser una cadena de texto' })
-        .optional()
-        .refine(val => val === undefined || (val.length > 0 && noNumbersRegex.test(val)), { message: 'La descripción no debe estar vacía' })
-});
+  nombreZona: z.string({ message: 'El nombre debe ser una cadena de texto' })
+    .min(1, { message: 'El campo no puede estar vacio' }),
+  descripcionZona: z.string({ message: 'Esta descripción debe ser una cadena de texto' })
+    .min(1, { message: 'El campo no puede estar vacio' })
+})
 
-export function validateZonaUpdate(zone) {
-    return zoneUpdate.safeParse(zone);
+export function validateZonaUpdate (zone) {
+  return zoneUpdate.safeParse(zone)
 }
