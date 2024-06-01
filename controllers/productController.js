@@ -20,7 +20,7 @@ export default class ProductController {
 
   static async createProduct (req, res) {
     const result = validateProduct(req.body)
-    if (!result.success) return res.status(400).json({ message: JSON.parse(result.error.message)[0].message })
+    if (!result.success) return res.status(400).json({ objectError: result.error.errors })
 
     const response = await ProductModel.createProduct({ input: result.data })
     if (response instanceof Error) return res.status(500).json({ message: 'Error en el servidor' })
@@ -31,7 +31,7 @@ export default class ProductController {
     const { id } = req.params
 
     const result = validateProduct(req.body)
-    if (!result.success) return res.status(400).json({ message: JSON.parse(result.error.message)[0].message })
+    if (!result.success) return res.status(400).json({ objectError: result.error.errors })
 
     const response = await ProductModel.updateProduct({ id, input: result.data })
     if (response instanceof Error) return res.status(500).json({ message: 'Error en el servidor' })
@@ -42,7 +42,7 @@ export default class ProductController {
     const { id } = req.params
 
     const result = validateProductDelete(req.body)
-    if (!result.success) return res.status(400).json({ message: JSON.parse(result.error.message)[0].message })
+    if (!result.success) return res.status(400).json({ objectError: result.error.errors })
 
     const response = await ProductModel.deleteProduct({ id, input: result.data })
     if (response instanceof Error) return res.status(500).json({ message: 'Error en el servidor' })
