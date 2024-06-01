@@ -45,7 +45,7 @@ export class UserModel {
 
   static async createUser (input) {
     try {
-      const { correoUsuario, passwordUsuario, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
+      const { correoUsuario, passwordUsuario, idGenero, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
       const [[existingData]] = await db.query(`
         SELECT numero_documento_usuario
         FROM usuarios
@@ -55,8 +55,8 @@ export class UserModel {
       const saltRounds = 10
       const encryPassword = await bcrypt.hash(passwordUsuario, saltRounds)
       const [usuario] = await db.query(`INSERT INTO usuarios (correo_usuario, password_usuario, estado_usuario,id_genero, id_tipo_usuario,numero_documento_usuario, primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario,telefono_usuario,direccion_usuario,fecha_nacimiento_usuario,link_foto_usuario) 
-      VALUES (?,?,1,?,?,?,?,?,?,?,?,?,?,?);
-      `, [correoUsuario, encryPassword, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, linkFoto])
+      VALUES (?,?,1,?,2,?,?,?,?,?,?,?,?,?);
+      `, [correoUsuario, encryPassword, idGenero, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, linkFoto])
       return usuario
     } catch (err) {
       return err
@@ -71,7 +71,6 @@ export class UserModel {
       SELECT BIN_TO_UUID(id_usuario) id 
       FROM usuarios
       WHERE correo_usuario = ? AND id_usuario != UUID_TO_BIN(?)`, [correoUsuario, id])
-      console.log(verifyEmail)
       if (verifyEmail.length > 0) throw new DuplicateInfo()
 
       const [verifyUser] = await db.query(`

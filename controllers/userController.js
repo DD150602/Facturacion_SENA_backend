@@ -1,6 +1,7 @@
 import { UserModel } from '../models/userModel.js'
 import { NoData, DuplicateInfo, DocumentInUse, AccountAlreadyDisable, ActionNotAllowed } from '../schemas/errorSchema.js'
 import { validateUserById, validateUserDataCreate, validateUserDataUpdate, validateUserDelete } from '../schemas/user.js'
+import { UploadFilesModel } from '../models/uploadFilesModel.js'
 
 export class UserController {
   static async getAll (req, res) {
@@ -33,6 +34,9 @@ export class UserController {
   static async createUser (req, res) {
     const result = validateUserDataCreate(req.body)
     if (!result.success) return res.status(400).json({ objectError: result.error.errors })
+    const { files } = req
+    files ? result.data.linkFoto = await UploadFilesModel.uploadFiles(files, 'photos_profile') : result.data.linkFoto = null
+    if (result.data.linkFoto instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
     const response = await UserModel.createUser(result.data)
     if (response instanceof DuplicateInfo) {
       res.status(400).json({ message: 'El usuario ya esta registrado' })
@@ -50,6 +54,10 @@ export class UserController {
 
     const result = validateUserDataUpdate(req.body)
     if (!result.success) return res.status(400).json({ objectError: result.error.errors })
+
+    const { files } = req
+    if (files) result.data.linkFoto = await UploadFilesModel.uploadFiles(files, 'photos_profile')
+    if (result.data.linkFoto instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
 
     const response = await UserModel.updateUser({ id: resultId.data.id, input: result.data })
     if (response instanceof DuplicateInfo) return res.status(409).json({ message: 'El correo electronico ya se encuentra en uso' })
