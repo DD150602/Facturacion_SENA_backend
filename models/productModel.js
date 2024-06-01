@@ -21,9 +21,9 @@ export default class ProductModel {
 
   static async getProductsById (id) {
     try {
-      const [res] = await db.query(
+      const [[res]] = await db.query(
         `
-        SELECT id_producto, nombre_producto, descripcion_producto, valor_producto, link_foto_producto 
+        SELECT id_producto, nombre_producto AS nombreProducto, descripcion_producto AS descripcionProducto, valor_producto AS valorProducto, link_foto_producto AS linkFotoProducto
         FROM productos 
         WHERE estado_producto = 1 AND id_producto = ?`, [id]
       )
