@@ -28,7 +28,6 @@ const userCreateSchema = z.object({
   passwordUsuario: z.string().min(1, { message: 'La contraseña del usuario no puede estar vacía.' }),
   correoUsuario: z.string().email({ message: 'El correo no esta correctamente escrito' }).min(1, { message: 'El correo del usuario no puede estar vacío.' }),
   idGenero: z.string().min(1, { message: 'El ID del género no puede estar vacío.' }),
-  idTipoUsuario: z.number().int().min(1).max(5, { message: 'No se ha ingresado ningun tipo de usuario' }),
   telefonoUsuario: z.string()
     .min(10, { message: 'El número de telefono del usuario debe tener 10 caracteres.' })
     .max(10, { message: 'El número de telefono del usuario debe tener 10 caracteres.' })
@@ -37,8 +36,7 @@ const userCreateSchema = z.object({
     const colombianAddressRegex = /^.*\b(calle|carrera|avenida|diagonal|transversal|manzana|mz|avenida carrera|vía)\b.*/gi
     return colombianAddressRegex.test(value)
   }, 'La direccion tiene un formato invalido'),
-  fechaNacimientoUsuario: z.string('La fecha de nacimiento debe ser una cadena de texto').date('La fecha de nacimiento no tiene un formato valido'),
-  linkFoto: z.string().optional()
+  fechaNacimientoUsuario: z.string('La fecha de nacimiento debe ser una cadena de texto').date('La fecha de nacimiento no tiene un formato valido')
 })
 
 const userUpdateSchema = z.object({
