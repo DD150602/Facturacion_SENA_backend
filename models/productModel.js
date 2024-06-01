@@ -6,7 +6,7 @@ export default class ProductModel {
     try {
       const [res] = await db.query(
         `
-        SELECT id_producto, nombre_producto, descripcion_producto, valor_producto, link_foto_producto 
+        SELECT id_producto AS id, nombre_producto, descripcion_producto, valor_producto, link_foto_producto 
         FROM productos
         WHERE estado_producto = 1
         `
