@@ -5,7 +5,7 @@ const productSchema = z.object({
   descripcionProducto: z.string({ message: 'La descripción tiene que ser una cadena de texto.' }).min(1, { message: 'La descripcion no puede estar vacía.' }),
   valorProducto: z.string({ message: 'El precio tiene que ser un número.' })
     .min(1, { message: 'El precio no puede estar vacío.' })
-    .refine(value => /^[0-9]{1,9}$/.test(value), { message: 'El precio debe ser un número positivo sin caracteres especiales.' }),
+    .refine(value => /^[0-9]{1,9}$/.test(value), { message: 'El precio debe ser un número positivo sin caracteres especiales que no supere 9 digitos.' }),
   linkFotoProducto: z.string({ message: 'El link de la imagen tiene que ser una cadena de texto.' })
 })
 
