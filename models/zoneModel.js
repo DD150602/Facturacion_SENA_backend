@@ -1,5 +1,5 @@
 import db from '../config/database.js'
-import { NoData, DuplicateInfo  } from '../schemas/errorSchema.js'
+import { NoData, DuplicateInfo } from '../schemas/errorSchema.js'
 
 export default class zoneModel {
   static async getAllzone () {
@@ -41,7 +41,6 @@ export default class zoneModel {
       if(insert.length === 0) return new NoData()
       return insert
     }catch (error){
-
       return error 
     }
   }
@@ -96,10 +95,4 @@ static async addUserZone(id, zonaId){
   }
 }
 
-}
-      console.log(error)
-      return error
-    }
-
-  }
 }

@@ -13,7 +13,7 @@ export default class zoneController{
       res.json(response)
     }
   };
-  
+
   static async createZone (req, res) {
      const data = validateZona(req.body)
      if(!data.success){
@@ -28,10 +28,11 @@ export default class zoneController{
         res.status(200).json({ message: 'Zona registrada con exito' })
      }
   };
-  
+
   static async updatedZone (req, res){
     const { id } = req.params
     const updata = validateZonaUpdate(req.body)
+
     if(!updata.success){
       return res.status(400).json({ message: JSON.parse(updata.error.message)[0].message })
     }
@@ -44,8 +45,7 @@ export default class zoneController{
       res.json({ message: 'Zona actualizada con exito' })
    }
   };
-  
-  
+
   static async addUserToZone(req, res){
     const { id } = req.params
     const zonaId = req.body.id[0]
@@ -82,10 +82,5 @@ export default class zoneController{
       res.json(response)
     }
   }
-   
-  };
-  
+
 }
-
-
-
