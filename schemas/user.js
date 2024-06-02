@@ -42,7 +42,7 @@ const userCreateSchema = z.object({
 const userUpdateSchema = z.object({
   primerNombreUsuario: z.string()
     .min(1, { message: 'El primer nombre del usuario no puede estar vacío.' })
-    .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El primer nombre del usaurio no puede contener caracteres especiales.' }),
+    .refine(value => /^[a-zA-Z]+$/.test(value), { message: 'El primer nombre del usuario no puede contener caracteres especiales.' }),
   segundoNombreUsuario: z.string({
     message: 'El segundo nombre del usuario tiene que ser texto.'
   })
