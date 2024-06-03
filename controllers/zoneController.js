@@ -85,6 +85,7 @@ export default class zoneController {
   }
 
 
+
   static async getUserById(req, res) {
     const { id } = req.params
     const response = await ZoneModel.getUser(id)

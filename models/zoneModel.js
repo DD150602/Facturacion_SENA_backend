@@ -35,6 +35,17 @@ export default class zoneModel {
     }
   }
 
+
+  static async createZone(input) {
+    const { nombreZona, descripcionZona } = input
+    try {
+      const insert = await db.query('INSERT INTO zonas (nombre_zona, descripcion_zona) VALUES (?,?)', [nombreZona, descripcionZona])
+      if (!insert) return new NoData()
+      if (insert.length === 0) return new NoData()
+      return insert
+    } catch (error) {
+
+
   static async createZone(input) {
     const { nombreZona, descripcionZona } = input
     try {
@@ -47,6 +58,9 @@ export default class zoneModel {
       return error
     }
   }
+
+
+
 
   static async updateZone(id, input) {
     try {
