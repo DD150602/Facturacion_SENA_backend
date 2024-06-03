@@ -10,6 +10,13 @@ export class FacturaController {
     return res.json(response)
   }
 
+  static async verPorducts (req, res) {
+    const result = await InvoiceModel.getAllProducts()
+    if (result instanceof NoData) return res.status(404).json('No se han encontrado datos para cargar.')
+    if (result instanceof Error) return res.status(500).json('Error interno en el servidor')
+    return res.json(result)
+  }
+
   static async getTipoProducto (req, res) {
     const response = await InvoiceModel.getTipoCuota()
     if (response instanceof NoData) return res.status(404).json('No se han encontrado datos para cargar.')

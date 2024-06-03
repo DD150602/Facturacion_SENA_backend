@@ -109,6 +109,23 @@ export class InvoiceModel {
       return error
     }
   }
+
+  static async getAllProducts () {
+    try {
+      const [res] = await db.query(
+        `
+        SELECT id_producto AS id, nombre_producto as value , valor_producto 
+        FROM productos
+        WHERE estado_producto = 1
+        `
+      )
+      if (!res) return new NoData()
+      if (res.length === 0) return new NoData()
+      return res
+    } catch (error) {
+      return error
+    }
+  }
 }
 
 export default InvoiceModel
