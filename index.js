@@ -13,7 +13,6 @@ import repoteVentasRouter from './routes/reporteVentasRouter.js'
 import { paymentRoutes } from './routes/paymentRoutes.js'
 import { FacturaRoute } from './routes/facturaRoutes.js'
 
-
 const app = express()
 app.use(corsMiddleware())
 app.use(json())

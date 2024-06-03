@@ -19,6 +19,9 @@ export class UploadFilesModel {
       fs.unlinkSync(uploadPath)
       return downloadURL
     } catch (error) {
+      const { archivo } = files
+      const uploadPath = path.join(__dirname, '../temp', archivo.name)
+      fs.unlinkSync(uploadPath)
       return (error)
     }
   }

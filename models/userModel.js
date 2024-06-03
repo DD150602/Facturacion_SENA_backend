@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 export class UserModel {
   static async getAll () {
     try {
-      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario,primer_nombre_usuario,primer_apellido_usuario,correo_usuario,telefono_usuario,estado_usuario FROM usuarios
+      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario,CONCAT_WS(' ',primer_nombre_usuario,primer_apellido_usuario) nombre_usuario,correo_usuario,telefono_usuario,estado_usuario FROM usuarios
       WHERE id_tipo_usuario = 2`)
       if (result.length === 0) {
         throw new NoData()
@@ -19,7 +19,7 @@ export class UserModel {
   static async getById ({ id }) {
     try {
       const [[result]] = await db.query(`
-      SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario,primer_nombre_usuario,segundo_nombre_usuario,primer_apellido_usuario,segundo_apellido_usuario,correo_usuario,usuarios.estado_usuario,tipo_usuario.descripcion_usuario,tipo_usuario.id_tipo_usuario,genero.id_genero, link_foto_usuario, telefono_usuario,direccion_usuario,fecha_nacimiento_usuario
+      SELECT BIN_TO_UUID(id_usuario) id, numero_documento_usuario as numeroDocumentoUsuario ,primer_nombre_usuario as primerNombreUsuario,segundo_nombre_usuario as segundoNombreUsuario,primer_apellido_usuario as primerApellidoUsuario,segundo_apellido_usuario as segundoApellidoUsuario,correo_usuario as correoUsuario,genero.id_genero as idGenero, link_foto_usuario as linkFoto, telefono_usuario as telefonoUsuario,direccion_usuario as direccionUsuario,DATE_FORMAT(fecha_nacimiento_usuario, '%Y-%m-%d') AS fechaNacimientoUsuario
       FROM usuarios
       INNER JOIN tipo_usuario ON usuarios.id_tipo_usuario = tipo_usuario.id_tipo_usuario
       INNER JOIN genero ON genero.id_genero = usuarios.id_genero
@@ -33,19 +33,20 @@ export class UserModel {
 
   static async getByZone ({ id }) {
     try {
-      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id,primer_nombre_usuario,primer_apellido_usuario
+      const [result] = await db.query(`SELECT BIN_TO_UUID(id_usuario) id,CONCAT_WS(' ',numero_documento_usuario,primer_nombre_usuario,primer_apellido_usuario) AS label
       FROM usuarios
-      WHERE id_zona = (SELECT id_zona from usuarios WHERE id_usuario = UUID_TO_BIN(?)) AND estado_usuario=1;`, [id])
+      WHERE id_zona = (SELECT id_zona from usuarios WHERE id_usuario = UUID_TO_BIN(?)) AND estado_usuario = 1 AND id_usuario != UUID_TO_BIN(?);`, [id, id])
       if (result.length === 0) throw new NoData()
       return result
     } catch (err) {
+      console.log(err)
       return err
     }
   }
 
   static async createUser (input) {
     try {
-      const { correoUsuario, passwordUsuario, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
+      const { correoUsuario, passwordUsuario, idGenero, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario } = input
       const [[existingData]] = await db.query(`
         SELECT numero_documento_usuario
         FROM usuarios
@@ -55,8 +56,8 @@ export class UserModel {
       const saltRounds = 10
       const encryPassword = await bcrypt.hash(passwordUsuario, saltRounds)
       const [usuario] = await db.query(`INSERT INTO usuarios (correo_usuario, password_usuario, estado_usuario,id_genero, id_tipo_usuario,numero_documento_usuario, primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario,telefono_usuario,direccion_usuario,fecha_nacimiento_usuario,link_foto_usuario) 
-      VALUES (?,?,1,?,?,?,?,?,?,?,?,?,?,?);
-      `, [correoUsuario, encryPassword, idGenero, idTipoUsuario, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, linkFoto])
+      VALUES (?,?,1,?,2,?,?,?,?,?,?,?,?,?);
+      `, [correoUsuario, encryPassword, idGenero, numeroDocumentoUsuario, primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, linkFoto])
       return usuario
     } catch (err) {
       return err
@@ -71,7 +72,6 @@ export class UserModel {
       SELECT BIN_TO_UUID(id_usuario) id 
       FROM usuarios
       WHERE correo_usuario = ? AND id_usuario != UUID_TO_BIN(?)`, [correoUsuario, id])
-      console.log(verifyEmail)
       if (verifyEmail.length > 0) throw new DuplicateInfo()
 
       const [verifyUser] = await db.query(`
