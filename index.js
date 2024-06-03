@@ -13,7 +13,6 @@ import repoteVentasRouter from './routes/reporteVentasRouter.js'
 import { paymentRoutes } from './routes/paymentRoutes.js'
 import { FacturaRoute } from './routes/facturaRoutes.js'
 
-
 const app = express()
 app.use(corsMiddleware())
 app.use(json())
@@ -30,5 +29,6 @@ app.use('/abonos', paymentRoutes)
 app.use('/facturas', FacturaRoute)
 app.use("/gestion_cliente", ClienteRouter)
 app.use('/zona', zona)
+
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT ?? 1234}`))
