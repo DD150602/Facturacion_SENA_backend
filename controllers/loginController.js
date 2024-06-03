@@ -24,6 +24,10 @@ class AuthController {
                 return res.status(401).json({ error: 'Credenciales incorrectas' });
             }
 
+            if(user[0].estado_usuario === 0) return res.status(401).json({error: 'Su cuenta esta actualmente desactivada'})
+
+            if(user[0].id_zona === null && user[0].id_tipo_usuario === 2) return res.status(401).json({error: 'No cuenta con una zona de trabajo asignada por favor contactese con un administrador'})
+
             const token = jwt.sign({ userId: user.id }, 'token_secret', { expiresIn: '1h' });
 
             res.json({ token, user: user[0] });
