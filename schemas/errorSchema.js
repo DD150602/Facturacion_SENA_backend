@@ -14,5 +14,7 @@ export const DocumentInUse = ErrorFactory('Document is in use')
 export const AccountAlreadyDisable = ErrorFactory('User is disable')
 export const ActionNotAllowed = ErrorFactory('Action no allowed')
 export const NoInsert = ErrorFactory('No insert')
+export const InfoAlreadyExisting = ErrorFactory('The information already exists')
+export const NoDataFound = ErrorFactory('Data not found')
 
 
