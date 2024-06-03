@@ -44,7 +44,9 @@ export default class zoneModel {
       if (insert.length === 0) return new NoData()
       return insert
     } catch (error) {
-
+      return error
+    }
+  }
 
   static async createZone(input) {
     const { nombreZona, descripcionZona } = input
