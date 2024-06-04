@@ -72,7 +72,7 @@ export default class zoneModel {
             primer_apellido_usuario,
             telefono_usuario,
             direccion_usuario,
-            descripcion_zona
+            nombre_zona
             FROM usuarios
             INNER JOIN zonas ON usuarios.id_zona = zonas.id_zona
             WHERE numero_documento_usuario = ? AND estado_usuario = 1
