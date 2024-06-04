@@ -1,6 +1,9 @@
 import db from '../config/database.js'
 import { NoData } from '../schemas/errorSchema.js'
 import transporter from '../config/connectionEmail.js'
+import PDFDocument from 'pdfkit'
+import fs from 'fs'
+
 export class InvoiceModel {
   static async getAll () {
     try {
@@ -61,7 +64,7 @@ export class InvoiceModel {
         await db.query(
             `INSERT INTO facturas_has_productos (valor_producto, id_factura , id_producto , cantidad_producto)
             VALUES ( ? , ?, ? , ? );`,
-            [factura.valorProducto, result[0].codigo_secundario, factura.idProduct, factura.cantidad]
+            [factura.precio, result[0].codigo_secundario, factura.id, factura.cantidad]
         )
       }
       await db.commit()
@@ -74,28 +77,108 @@ export class InvoiceModel {
   }
 
   static async sendFactura (input) {
-    const { nombreUsuario, apellidoUsuario, correoUsuario, link } = input
+    const {
+      correoUsuario,
+      nombreUsuario,
+      apellidoUsuario,
+      valorNetoFactura,
+      cantidadCuotasFactura,
+      fechaProximoPago,
+      productosFacturas
+    } = input
+
+    // Crear un nuevo documento PDF con márgenes
+    const doc = new PDFDocument({ margin: 50 })
+    doc.pipe(fs.createWriteStream('factura.pdf'))
+
+    // Establecer colores y estilos
+    const primaryColor = '#1E88E5' // Azul oscuro
+    const textColor = '#333333'
+
+    // Encabezado
+    doc.rect(0, 0, 612, 100).fill(primaryColor)
+    try {
+      doc.image('logo.png', 50, 25, { width: 50 })
+    } catch (e) {
+      console.log('Logo not found, skipping logo addition')
+    }
+    doc.fillColor('#FFFFFF').fontSize(24).text('FTM', 110, 40)
+    doc.moveDown(3) // Añadir más espacio después del encabezado
+
+    // Contenido principal
+    doc.fillColor(textColor)
+    doc.fontSize(20).text('Factura', { align: 'center' }).moveDown()
+    doc.fontSize(12).text('Empresa: FTM').moveDown()
+    doc.text(`Nombre del cliente: ${nombreUsuario} ${apellidoUsuario}`).moveDown()
+    doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`).moveDown()
+    doc.text(`Fecha de Próximo Pago: ${fechaProximoPago}`).moveDown()
+    doc.text(`Cantidad de Cuotas: ${cantidadCuotasFactura}`).moveDown()
+    doc.moveDown()
+    doc.fontSize(16).text('Detalles de los Productos:', { underline: true }).moveDown()
+    doc.fontSize(12)
+
+    productosFacturas.forEach(producto => {
+      doc.text(`- ${producto.nombre}:`, { continued: true })
+        .text(` Cantidad: ${producto.cantidad},`, { continued: true })
+        .text(` Precio: $${producto.precio.toFixed(2)}`, { align: 'right' })
+      doc.moveDown()
+    })
+
+    doc.moveDown()
+    doc.fontSize(14).text(`Valor Neto de la Factura: $${valorNetoFactura.toFixed(2)}`, { align: 'right' }).moveDown()
+
+    // Finalizar el documento PDF
+    doc.end()
+
+    // Enviar el correo electrónico con el PDF adjunto
     try {
       const mailOptions = {
-        from: 'samivazqueles@gmail.com',
+        from: 'ftmEnvios@ftm.com',
         to: `${correoUsuario}`,
         subject: 'Factura Disponible',
         html: `
-          <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #F3F4F6; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative;">
-            <div style="text-align: center; margin-bottom: 20px;">
-              <i class="fas fa-dog" style="color: #4CAF50; font-size: 48px;"></i>
-            </div>
-            <h2 style="color: #333; font-size: 18px; margin-bottom: 10px;">
-              <strong>Nombre del cliente:</strong> Hola ${nombreUsuario} ${apellidoUsuario},
-            </h2>
-            <p style="color: #333; font-size: 16px; margin-bottom: 10px;">
-              Tu factura ya está disponible. Puedes acceder a través del siguiente enlace:
-            </p>
-            <p style="text-align: center;">
-              <a href="${link}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">Ver Factura</a>
-            </p>
-          </div>
-        `
+              <html>
+                  <head>
+                      <style>
+                          body {
+                              font-family: Arial, sans-serif;
+                              background-color: #F3F4F6;
+                              color: #333;
+                          }
+                          .container {
+                              max-width: 600px;
+                              margin: 0 auto;
+                              padding: 20px;
+                              border-radius: 10px;
+                              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                          }
+                          h1 {
+                              color: #1E88E5; /* Azul oscuro */
+                              text-align: center;
+                          }
+                          p {
+                              font-size: 16px;
+                              margin-bottom: 10px;
+                          }
+                      </style>
+                  </head>
+                  <body>
+                      <div class="container">
+                          <h1>FTM</h1>
+                          <p>Estimado ${nombreUsuario} ${apellidoUsuario},</p>
+                          <p>Adjuntamos la factura correspondiente a tus compras.</p>
+                          <p>Atentamente,</p>
+                          <p>El equipo de FTM</p>
+                      </div>
+                  </body>
+              </html>
+          `,
+        attachments: [
+          {
+            filename: 'factura.pdf',
+            path: 'factura.pdf'
+          }
+        ]
       }
 
       transporter.sendMail(mailOptions, function (error, info) {

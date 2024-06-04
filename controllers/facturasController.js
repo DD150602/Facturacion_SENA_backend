@@ -1,6 +1,6 @@
 import { InvoiceModel } from '../models/facturasModels.js'
 import { NoData, DuplicateInfo } from '../schemas/errorSchema.js'
-import { validateInvoiceById, validateInvoiceDataCreate, validacionSend } from '../schemas/errorFacturacion.js'
+import { validateInvoiceById, validateInvoiceDataCreate } from '../schemas/errorFacturacion.js'
 
 export class FacturaController {
   static async getAll (req, res) {
@@ -8,6 +8,13 @@ export class FacturaController {
     if (response instanceof NoData) return res.status(404).json('No se han encontrado datos para cargar.')
     if (response instanceof Error) return res.status(500).json('Error interno en el servidor')
     return res.json(response)
+  }
+
+  static async verPorducts (req, res) {
+    const result = await InvoiceModel.getAllProducts()
+    if (result instanceof NoData) return res.status(404).json('No se han encontrado datos para cargar.')
+    if (result instanceof Error) return res.status(500).json('Error interno en el servidor')
+    return res.json(result)
   }
 
   static async getTipoProducto (req, res) {
@@ -41,9 +48,8 @@ export class FacturaController {
   }
 
   static async sendFacturaController (req, res) {
-    const result = validacionSend(req.body)
-    if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
-    const response = await InvoiceModel.sendFactura(result.data)
+    console.log(req.body)
+    const response = await InvoiceModel.sendFactura(req.body)
     if (response instanceof Error) {
       res.status(500).json({ message: 'Error interno del servidor ' })
     } else {
