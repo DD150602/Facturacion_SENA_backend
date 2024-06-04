@@ -24,9 +24,9 @@ const createInvoiceSchema = z.object({
     .int({ message: 'El ID del tipo de cuota debe ser un número entero.' })
     .positive({ message: 'El ID del tipo de cuota debe ser positivo.' }),
   productosFacturas: z.array(z.object({
-    idProducto: z.number({ message: 'No se ha proporcionado un ID de producto valido.' })
+    id: z.number({ message: 'No se ha proporcionado un ID de producto valido.' })
       .positive({ message: 'El ID del producto enviado no es valido.' }),
-    valorProducto: z.number({ message: 'No se ha proporcionado un valor de producto valido.' })
+    precio: z.number({ message: 'No se ha proporcionado un valor de producto valido.' })
       .positive({ message: 'El valor del producto enviado no es valido.' }),
     cantidad: z.number({ message: 'No se ha proporcionado una cantidad de producto valida.' })
       .positive({ message: 'La cantidad del producto enviado no es valida.' })

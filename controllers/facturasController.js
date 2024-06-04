@@ -1,6 +1,6 @@
 import { InvoiceModel } from '../models/facturasModels.js'
 import { NoData, DuplicateInfo } from '../schemas/errorSchema.js'
-import { validateInvoiceById, validateInvoiceDataCreate, validacionSend } from '../schemas/errorFacturacion.js'
+import { validateInvoiceById, validateInvoiceDataCreate } from '../schemas/errorFacturacion.js'
 
 export class FacturaController {
   static async getAll (req, res) {
@@ -48,9 +48,8 @@ export class FacturaController {
   }
 
   static async sendFacturaController (req, res) {
-    const result = validacionSend(req.body)
-    if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
-    const response = await InvoiceModel.sendFactura(result.data)
+    console.log(req.body)
+    const response = await InvoiceModel.sendFactura(req.body)
     if (response instanceof Error) {
       res.status(500).json({ message: 'Error interno del servidor ' })
     } else {
