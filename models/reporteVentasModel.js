@@ -23,7 +23,7 @@ export default class ReporteVentasModel {
     try {
       const { month = null, year = null } = input
       const [[info]] = await db.query(
-        `SELECT CONCAT_WS(' ', primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario) AS nombre_usuario,correo_usuario, telefono_usuario
+        `SELECT CONCAT_WS(' ', primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario) AS nombre_usuario,correo_usuario, telefono_usuario, link_foto_usuario
         FROM usuarios
         WHERE usuarios.id_usuario = UUID_TO_BIN(?)`, [id]
       )
