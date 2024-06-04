@@ -15,7 +15,7 @@ export class ClientModel {
 
   static async getData () {
     try {
-      const [data] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, CONCAT_WS(' ',numero_documento_cliente,primer_nombre_cliente,primer_apellido_cliente) AS label
+      const [data] = await db.query(`SELECT numero_documento_cliente AS id, CONCAT_WS(' ',numero_documento_cliente,primer_nombre_cliente,primer_apellido_cliente) AS label
       FROM clientes
       WHERE estado_cliente = 1`)
       if (!data) throw new NoData()
