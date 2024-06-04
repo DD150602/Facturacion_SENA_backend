@@ -5,8 +5,9 @@ export default class ReporteVentasModel {
   static async getAll () {
     try {
       const [users] = await db.query(
-        `SELECT BIN_TO_UUID(id_usuario) id_usuario, CONCAT_WS(' ', primer_nombre_usuario, primer_apellido_usuario) AS nombre, correo_usuario
+        `SELECT BIN_TO_UUID(id_usuario) id, CONCAT_WS(' ', primer_nombre_usuario, primer_apellido_usuario) AS nombre, correo_usuario, numero_documento_usuario, descripcion_zona
         FROM usuarios
+        INNER JOIN zonas ON usuarios.id_zona = zonas.id_zona
         WHERE estado_usuario = 1 AND id_tipo_usuario = 2`
       )
       if (!users) throw new NoData()
