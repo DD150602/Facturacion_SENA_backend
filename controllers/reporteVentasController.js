@@ -12,7 +12,8 @@ export default class ReporteVentasController {
 
   static async getInfoForReport (req, res) {
     const { id } = req.params
-    const response = await ReporteVentasModel.getInfoForReport(id)
+    const { month = null, year = null } = req.query
+    const response = await ReporteVentasModel.getInfoForReport({ id, input: { month, year } })
     if (response instanceof NoData) return res.status(404).json({ message: 'No se han encontrado datos para cargar.' })
     if (response instanceof Error) return res.status(500).json({ message: 'Error interno en el servidor' })
 
