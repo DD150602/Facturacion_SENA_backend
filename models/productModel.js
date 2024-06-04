@@ -67,7 +67,6 @@ export default class ProductModel {
       await db.query('UPDATE productos SET estado_producto = 0, anotacion_producto = ? WHERE id_producto = ?', [anotacion, id])
       return 'eliminado con exito'
     } catch (error) {
-      console.log(error)
       return error
     }
   }

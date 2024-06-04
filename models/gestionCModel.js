@@ -2,9 +2,9 @@ import db from '../config/database.js'
 import { NoData, DuplicateInfo, InfoAlreadyExisting } from '../schemas/errorSchema.js'
 
 export default class gestionCModel {
-    static async getAllClientes() {
-        try {
-            const [clientes] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, 
+  static async getAllClientes () {
+    try {
+      const [clientes] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, 
                 correo_cliente,
                 link_foto_cliente,
                 numero_documento_cliente,
@@ -14,19 +14,19 @@ export default class gestionCModel {
                 segundo_apellido_cliente,
                 telefono_cliente,
                 direccion_cliente
-                FROM clientes`);
+                FROM clientes`)
 
-            if (!clientes) throw new NoData();
-            if (clientes.length === 0) throw new NoData();
-            return (clientes);
-        } catch (error) {
-            console.error("Error al traer los clientes:", error);
-        }
+      if (!clientes) throw new NoData()
+      if (clientes.length === 0) throw new NoData()
+      return (clientes)
+    } catch (error) {
+      console.error('Error al traer los clientes:', error)
     }
+  }
 
-    static async getAllComprasById(id, mes = null, year = null) {
-        try {
-            let query = `
+  static async getAllComprasById (id, mes = null, year = null) {
+    try {
+      let query = `
             SELECT
                 f.id_factura as id,
                 f.fecha_factura,
@@ -47,91 +47,84 @@ export default class gestionCModel {
                 clientes c ON f.id_cliente = c.id_cliente
             WHERE 
                 c.id_cliente = UUID_TO_BIN(?)
-            `;
+            `
 
-            const params = [id];
-            if (mes && year) {
-                query += ` AND MONTH(f.fecha_factura) = ? AND YEAR(f.fecha_factura) = ?`;
-                params.push(mes, year);
-            } else if (mes) {
-                query += ` AND MONTH(f.fecha_factura) = ?`;
-                params.push(mes);
-            } else if (year) {
-                query += ` AND YEAR(f.fecha_factura) = ?`;
-                params.push(year);
-            }
+      const params = [id]
+      if (mes && year) {
+        query += ' AND MONTH(f.fecha_factura) = ? AND YEAR(f.fecha_factura) = ?'
+        params.push(mes, year)
+      } else if (mes) {
+        query += ' AND MONTH(f.fecha_factura) = ?'
+        params.push(mes)
+      } else if (year) {
+        query += ' AND YEAR(f.fecha_factura) = ?'
+        params.push(year)
+      }
 
-            const [compras] = await db.query(query, params);
+      const [compras] = await db.query(query, params)
 
-            if (!compras || compras.length === 0) throw new NoData();
+      if (!compras || compras.length === 0) throw new NoData()
 
-
-            const result = compras.reduce((acc, curr) => {
-                const factura = acc.find(item => item.id === curr.id);
-                if (factura) {
-                    factura.productos.push({
-                        id_producto: curr.id_producto,
-                        nombre_producto: curr.nombre_producto,
-                        descripcion_producto: curr.descripcion_producto,
-                        valor_producto: curr.valor_producto,
-                        cantidad_producto: curr.cantidad_producto
-                    });
-                } else {
-                    acc.push({
-                        id: curr.id,
-                        fecha_factura: curr.fecha_factura,
-                        valor_bruto_factura: curr.valor_bruto_factura,
-                        valor_neto_factura: curr.valor_neto_factura,
-                        productos: [{
-                            id_producto: curr.id_producto,
-                            nombre_producto: curr.nombre_producto,
-                            descripcion_producto: curr.descripcion_producto,
-                            valor_producto: curr.valor_producto,
-                            cantidad_producto: curr.cantidad_producto
-                        }]
-                    });
-                }
-                return acc;
-            }, []);
-
-            return result;
-        } catch (error) {
-            console.log(error);
-            return error;
+      const result = compras.reduce((acc, curr) => {
+        const factura = acc.find(item => item.id === curr.id)
+        if (factura) {
+          factura.productos.push({
+            id_producto: curr.id_producto,
+            nombre_producto: curr.nombre_producto,
+            descripcion_producto: curr.descripcion_producto,
+            valor_producto: curr.valor_producto,
+            cantidad_producto: curr.cantidad_producto
+          })
+        } else {
+          acc.push({
+            id: curr.id,
+            fecha_factura: curr.fecha_factura,
+            valor_bruto_factura: curr.valor_bruto_factura,
+            valor_neto_factura: curr.valor_neto_factura,
+            productos: [{
+              id_producto: curr.id_producto,
+              nombre_producto: curr.nombre_producto,
+              descripcion_producto: curr.descripcion_producto,
+              valor_producto: curr.valor_producto,
+              cantidad_producto: curr.cantidad_producto
+            }]
+          })
         }
+        return acc
+      }, [])
+
+      return result
+    } catch (error) {
+      return error
     }
+  }
 
+  static async updateClienteById ({ id, input }) {
+    try {
+      const {
+        correo_cliente
+      } = input
 
-
-
-
-    static async updateClienteById({ id, input }) {
-        try {
-            const {
-                correo_cliente,
-            } = input;
-
-            const [verifyEmail] = await db.query(`
+      const [verifyEmail] = await db.query(`
                 SELECT BIN_TO_UUID(id_cliente) id, correo_cliente
                 FROM clientes
                 WHERE correo_cliente = ? AND id_cliente != UUID_TO_BIN(?)
-            `, [correo_cliente, id]);
+            `, [correo_cliente, id])
 
-            if (verifyEmail.length > 0) throw new DuplicateInfo();
+      if (verifyEmail.length > 0) throw new DuplicateInfo()
 
+      const [update] = await db.query('UPDATE clientes SET ? WHERE id_cliente = UUID_TO_BIN(?)', [input, id])
 
-            const [update] = await db.query(`UPDATE clientes SET ? WHERE id_cliente = UUID_TO_BIN(?)`, [input, id]);
-
-            return update;
-        } catch (error) {
-            console.error(error);
-            return error;
-        }
+      return update
+    } catch (error) {
+      console.error(error)
+      return error
     }
+  }
 
-    static async getClienteById(id) {
-        try {
-            const [cliente] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, 
+  static async getClienteById (id) {
+    try {
+      const [cliente] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, 
                 correo_cliente,
                 link_foto_cliente,
                 numero_documento_cliente,
@@ -142,13 +135,13 @@ export default class gestionCModel {
                 telefono_cliente,
                 direccion_cliente
                 FROM clientes
-                WHERE id_cliente = UUID_TO_BIN(?)`, [id]);
-            if (!cliente) throw new NoData();
-            if (cliente.length === 0) throw new NoData();
-            return (cliente);
-        } catch (error) {
-            console.error("Error al traer el cliente:", error);
-            return error;
-        }
+                WHERE id_cliente = UUID_TO_BIN(?)`, [id])
+      if (!cliente) throw new NoData()
+      if (cliente.length === 0) throw new NoData()
+      return (cliente)
+    } catch (error) {
+      console.error('Error al traer el cliente:', error)
+      return error
     }
+  }
 }

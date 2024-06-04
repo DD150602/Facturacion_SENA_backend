@@ -48,7 +48,6 @@ export class FacturaController {
   }
 
   static async sendFacturaController (req, res) {
-    console.log(req.body)
     const response = await InvoiceModel.sendFactura(req.body)
     if (response instanceof Error) {
       res.status(500).json({ message: 'Error interno del servidor ' })

@@ -30,7 +30,6 @@ export default class zoneModel {
       if (res.length === 0) throw new NoData()
       return res
     } catch (error) {
-      console.log(error)
       return error
     }
   }
@@ -43,7 +42,6 @@ export default class zoneModel {
       await db.query('INSERT INTO zonas (nombre_zona, descripcion_zona) VALUES (?,?)', [nombreZona, descripcionZona])
       return 'Zona creada correctamente'
     } catch (error) {
-      console.log(error)
       return error
     }
   }
@@ -52,8 +50,9 @@ export default class zoneModel {
     try {
       const { nombreZona, descripcionZona } = input
       const [verificar] = await db.query('SELECT * FROM zonas WHERE nombre_zona = ? AND id_zona != UUID_TO_BIN(?)', [nombreZona, id])
-      if (verificar.length > 0) throw new DuplicateInfo()
-      console.log(verificar)
+      if (verificar.length > 0) {
+        throw new DuplicateInfo()
+      }
       const [update] = await db.query('UPDATE zonas SET nombre_zona = ? , descripcion_zona = ? WHERE id_zona = UUID_TO_BIN(?)', [nombreZona, descripcionZona, id])
 
       return update
@@ -82,7 +81,6 @@ export default class zoneModel {
       if (!responseUser || responseUser.length === 0) throw new NoData()
       return responseUser
     } catch (error) {
-      console.log(error)
       return error
     }
   }

@@ -1,11 +1,10 @@
-import db from "../config/database.js";
-import { NoData } from "../schemas/errorSchema.js";
+import db from '../config/database.js'
+import { NoData } from '../schemas/errorSchema.js'
 
 export default class InformeCModel {
-    static async getInformesCobros(id, mes = null, year = null) {
-        console.log(id)
-        try {
-            let query = 
+  static async getInformesCobros (id, mes = null, year = null) {
+    try {
+      let query =
             `SELECT 
                 f.id_factura AS id,
                 f.fecha_factura,
@@ -27,26 +26,25 @@ export default class InformeCModel {
             WHERE 
                 c.id_usuario = UUID_TO_BIN(?)`
 
-            const params = [id];
-            if (mes && year) {
-                query +=  `AND MONTH(t.fecha_transaccion) = ? AND YEAR(t.fecha_transaccion) = ?`;
-                params.push(mes, year);
-            } else if (mes) {
-                query +=  `AND MONTH(t.fecha_transaccion) = ?`;
-                params.push(mes);
-            } else if (year) {
-                query +=  `AND YEAR(t.fecha_transaccion) = ?`;
-                params.push(year);
-            }
+      const params = [id]
+      if (mes && year) {
+        query += 'AND MONTH(t.fecha_transaccion) = ? AND YEAR(t.fecha_transaccion) = ?'
+        params.push(mes, year)
+      } else if (mes) {
+        query += 'AND MONTH(t.fecha_transaccion) = ?'
+        params.push(mes)
+      } else if (year) {
+        query += 'AND YEAR(t.fecha_transaccion) = ?'
+        params.push(year)
+      }
 
-            const [informe] = await db.query(query, params);
+      const [informe] = await db.query(query, params)
 
-            if (!informe || informe.length === 0) throw new NoData();
+      if (!informe || informe.length === 0) throw new NoData()
 
-            return informe;
-        } catch (error) {
-            console.log(error);
-            return error;
-        }
+      return informe
+    } catch (error) {
+      return error
     }
+  }
 }

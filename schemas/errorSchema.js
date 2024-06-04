@@ -1,6 +1,6 @@
-function ErrorFactory(name) {
+function ErrorFactory (name) {
   return class BusinessError extends Error {
-    constructor(message) {
+    constructor (message) {
       super(message)
       this.name = name
     }
@@ -15,5 +15,3 @@ export const AccountAlreadyDisable = ErrorFactory('User is disable')
 export const ActionNotAllowed = ErrorFactory('Action no allowed')
 export const NoInsert = ErrorFactory('No insert')
 export const InfoAlreadyExisting = ErrorFactory('The information already exists')
-
-

@@ -5,5 +5,4 @@ const router = express.Router()
 
 router.post('/', loginController.Authlogin)
 
-
-export default router;
+export default router

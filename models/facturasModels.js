@@ -71,7 +71,6 @@ export class InvoiceModel {
       return invoice
     } catch (err) {
       await db.rollback()
-      console.log(err)
       return err
     }
   }
