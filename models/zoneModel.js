@@ -2,7 +2,7 @@ import db from '../config/database.js'
 import { NoData, DuplicateInfo } from '../schemas/errorSchema.js'
 
 export default class zoneModel {
-  static async getAllzone () {
+  static async getAllzone() {
     try {
       const [res] = await db.query(
         `
@@ -18,7 +18,7 @@ export default class zoneModel {
     }
   }
 
-  static async getZoneByID (id) {
+  static async getZoneByID(id) {
     try {
       const [res] = await db.query(
         `
@@ -35,7 +35,7 @@ export default class zoneModel {
     }
   }
 
-  static async createZone (input) {
+  static async createZone(input) {
     const { nombreZona, descripcionZona } = input
     try {
       const [verificar] = await db.query('SELECT * FROM zonas WHERE nombre_zona = ? ', [nombreZona])
@@ -48,7 +48,7 @@ export default class zoneModel {
     }
   }
 
-  static async updateZone (id, input) {
+  static async updateZone(id, input) {
     try {
       const { nombreZona, descripcionZona } = input
       const [verificar] = await db.query('SELECT * FROM zonas WHERE nombre_zona = ? AND id_zona != UUID_TO_BIN(?)', [nombreZona, id])
@@ -62,10 +62,10 @@ export default class zoneModel {
     }
   }
 
-  static async getUser (id) {
+  static async getUser(id) {
     try {
       const [responseUser] = await db.query(
-            `
+        `
             SELECT BIN_TO_UUID(id_usuario) AS id, correo_usuario,
             numero_documento_usuario, 
             primer_nombre_usuario, 
@@ -74,10 +74,10 @@ export default class zoneModel {
             direccion_usuario,
             nombre_zona
             FROM usuarios
-            INNER JOIN zonas ON usuarios.id_zona = zonas.id_zona
+            LEFT JOIN zonas ON usuarios.id_zona = zonas.id_zona
             WHERE numero_documento_usuario = ? AND estado_usuario = 1
             `,
-            [id]
+        [id]
       )
       if (!responseUser || responseUser.length === 0) throw new NoData()
       return responseUser
@@ -87,7 +87,7 @@ export default class zoneModel {
     }
   }
 
-  static async addUserZone (id, zonaId) {
+  static async addUserZone(id, zonaId) {
     try {
       const response = await db.query('UPDATE usuarios SET id_zona = UUID_TO_BIN(?) WHERE id_usuario = UUID_TO_BIN(?)', [zonaId, id])
       return response
