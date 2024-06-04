@@ -87,18 +87,9 @@ export default class zoneModel {
 
   static async addUserZone (id, zonaId) {
     try {
-      const [res] = await db.query(
-        `
-        SELECT BIN_TO_UUID(id_zona) id, nombre_zona, descripcion_zona 
-        FROM zonas WHERE id_zona = UUID_TO_BIN(?)
-        `, [id]
-      )
-      if (!res) throw new NoData()
-      if (res.length === 0) throw new NoData()
       const response = await db.query('UPDATE usuarios SET id_zona = UUID_TO_BIN(?) WHERE id_usuario = UUID_TO_BIN(?)', [zonaId, id])
       return response
     } catch (error) {
-      console.log(error)
       return error
     }
   }
