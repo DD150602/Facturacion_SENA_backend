@@ -44,7 +44,7 @@ export default class zoneController {
   static async getUserById (req, res) {
     const { id } = req.params
     const response = await ZoneModel.getUser(id)
-    if (response instanceof NoData) return res.status(404).json({ message: 'El usuario no eviste' })
+    if (response instanceof NoData) return res.status(404).json({ message: 'El usuario no existe' })
     if (response instanceof Error) return res.status(500).json({ message: 'Error en el servidor' })
     return res.json(response)
   }
