@@ -42,4 +42,17 @@ export class ClientModel {
       return err
     }
   }
+
+  static async getContactInfoClient (id) {
+    try {
+      const [data] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, CONCAT_WS(' ', primer_nombre_cliente, primer_apellido_cliente) AS label, numero_documento_cliente, correo_cliente, telefono_cliente, direccion_cliente
+      FROM clientes
+      WHERE id_zona = UUID_TO_BIN(?)`, [id])
+      if (!data) throw new NoData()
+      if (data.length === 0) throw new NoData()
+      return data
+    } catch (error) {
+      return error
+    }
+  }
 }

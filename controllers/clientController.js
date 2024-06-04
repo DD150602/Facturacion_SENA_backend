@@ -32,4 +32,12 @@ export class ClientController {
     if (response instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
     return res.json({ message: 'Cliente creado exitosamente' })
   }
+
+  static async getContactInfoCliente (req, res) {
+    const { id } = req.params
+    const response = await ClientModel.getContactInfoClient(id)
+    if (response instanceof NoData) return res.status(404).json({ message: 'No se han encontrado datos para cargar.' })
+    if (response instanceof Error) return res.status(500).json({ message: 'Error interno en el servidor' })
+    return res.json(response)
+  }
 }
