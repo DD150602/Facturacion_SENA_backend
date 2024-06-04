@@ -34,8 +34,8 @@ export default class zoneController {
 
   static async addUserToZone (req, res) {
     const { id } = req.params
-    const zonaId = req.body.id[0]
-    const response = await ZoneModel.addUserZone(id, zonaId)
+    const { idZona } = req.body
+    const response = await ZoneModel.addUserZone(id, idZona)
     if (response instanceof NoData) return res.status(400).json({ message: 'No se encontro al usuario para vincular' })
     if (response instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
     return res.json({ message: 'Vinculacion exitosa' })
