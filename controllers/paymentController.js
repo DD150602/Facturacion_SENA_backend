@@ -26,9 +26,16 @@ export class PaymentController {
 
   static async createPayment (req, res) {
     const result = validateCreatePayment(req.body)
-    if (!result.success) return res.status(400).json(`${JSON.parse(result.error.message)[0].message}`)
+    if (!result.success) return res.status(400).json({ objectError: result.error.errors })
     const response = await PaymentModel.createPayment(result.data)
     if (response instanceof Error) return res.status(500).json('Error interno en el servidor')
     return res.json(response)
+  }
+
+  static async getPaymentTypes (req, res) {
+    const response = await PaymentModel.getPaymentTypes()
+    if (response instanceof NoData) return res.status(404).json({ message: 'No hay tipos de pago existentes' })
+    if (response instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
+    res.json(response)
   }
 }
