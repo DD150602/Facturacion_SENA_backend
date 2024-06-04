@@ -3,9 +3,10 @@ import { NoData } from "../schemas/errorSchema.js";
 
 export default class InformeCModel {
     static async getInformesCobros(id, mes = null, year = null) {
+        console.log(id)
         try {
-            let query = `
-            SELECT 
+            let query = 
+            `SELECT 
                 f.id_factura AS id,
                 f.fecha_factura,
                 c.numero_cuota,
@@ -13,10 +14,6 @@ export default class InformeCModel {
                 t.entidad_bancaria,
                 t.fecha_transaccion,
                 t.estado_transaccion,
-                p.nombre_producto,
-                p.descripcion_producto,
-                p.valor_producto,
-                p.link_foto_producto,
                 cl.primer_nombre_cliente AS nombre_cliente,
                 cl.primer_apellido_cliente AS apellido_cliente
             FROM 
@@ -26,24 +23,19 @@ export default class InformeCModel {
             JOIN 
                 transacciones t ON c.id_transaccion = t.id_transaccion
             JOIN 
-                facturas_has_productos fhp ON f.id_factura = fhp.id_factura
-            JOIN 
-                productos p ON fhp.id_producto = p.id_producto
-            JOIN 
                 clientes cl ON f.id_cliente = cl.id_cliente
             WHERE 
-                c.id_usuario = UUID_TO_BIN(?)
-            `;
+                c.id_usuario = UUID_TO_BIN(?)`
 
             const params = [id];
             if (mes && year) {
-                query += ` AND MONTH(t.fecha_transaccion) = ? AND YEAR(t.fecha_transaccion) = ?`;
+                query +=  `AND MONTH(t.fecha_transaccion) = ? AND YEAR(t.fecha_transaccion) = ?`;
                 params.push(mes, year);
             } else if (mes) {
-                query += ` AND MONTH(t.fecha_transaccion) = ?`;
+                query +=  `AND MONTH(t.fecha_transaccion) = ?`;
                 params.push(mes);
             } else if (year) {
-                query += ` AND YEAR(t.fecha_transaccion) = ?`;
+                query +=  `AND YEAR(t.fecha_transaccion) = ?`;
                 params.push(year);
             }
 
@@ -57,6 +49,4 @@ export default class InformeCModel {
             return error;
         }
     }
-
-
 }
