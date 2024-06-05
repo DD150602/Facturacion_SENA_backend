@@ -7,7 +7,8 @@ export default class InformeCModel {
         try {
             let query =
                 `SELECT 
-            f.id_factura AS id,
+            BIN_TO_UUID(t.id_transaccion) AS id,
+            f.id_factura AS id_factura,
             f.fecha_factura,
             f.id_factura AS numero_factura,
             t.valor_transaccion AS valor_pago,
