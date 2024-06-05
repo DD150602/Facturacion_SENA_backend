@@ -5,7 +5,7 @@ export default class ReporteVentasModel {
   static async getAll () {
     try {
       const [users] = await db.query(
-        `SELECT BIN_TO_UUID(id_usuario) id, CONCAT_WS(' ', primer_nombre_usuario, primer_apellido_usuario) AS nombre, correo_usuario, numero_documento_usuario, descripcion_zona
+        `SELECT BIN_TO_UUID(id_usuario) id, CONCAT_WS(' ', primer_nombre_usuario, primer_apellido_usuario) AS nombre, correo_usuario, numero_documento_usuario, descripcion_zona, (SELECT SUM(valor_neto_factura) FROM facturas WHERE facturas.id_usuario = UUID_TO_BIN(id)) AS total_ventas, (SELECT SUM(pago_recibido) FROM facturas WHERE facturas.id_usuario = UUID_TO_BIN(id)) AS total_cobros
         FROM usuarios
         INNER JOIN zonas ON usuarios.id_zona = zonas.id_zona
         WHERE estado_usuario = 1 AND id_tipo_usuario = 2`
