@@ -28,7 +28,18 @@ export default class ReporteVentasModel {
         WHERE usuarios.id_usuario = UUID_TO_BIN(?)`, [id]
       )
 
-      let query = `SELECT id_factura AS id, CONCAT_WS(' ', primer_nombre_cliente, primer_apellido_cliente) AS nombre_cliente, correo_cliente, valor_neto_factura
+      const [[totalVentas]] = await db.query(
+        'SELECT SUM(valor_neto_factura) AS total_ventas FROM facturas WHERE facturas.id_usuario = UUID_TO_BIN(?)',
+        [id]
+      )
+
+      const [[totalCobros]] = await db.query(
+        'SELECT SUM(pago_recibido) AS total_cobros FROM facturas WHERE facturas.id_usuario = UUID_TO_BIN(?)',
+        [id]
+      )
+
+      let query = `SELECT id_factura AS id, CONCAT_WS(' ', primer_nombre_cliente, primer_apellido_cliente) AS nombre_cliente, correo_cliente, valor_neto_factura,
+      pago_recibido
       FROM facturas
       INNER JOIN clientes ON facturas.id_cliente = clientes.id_cliente
       WHERE facturas.id_usuario = UUID_TO_BIN(?)`
@@ -50,7 +61,7 @@ export default class ReporteVentasModel {
       if (!info) throw new NoData()
       if (info.length === 0) throw new NoData()
 
-      return { ...info, infoFacturas }
+      return { ...info, totalCobros: totalCobros.total_cobros, totalVentas: totalVentas.total_ventas, infoFacturas }
     } catch (error) {
       return error
     }
