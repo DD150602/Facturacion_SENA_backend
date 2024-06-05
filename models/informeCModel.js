@@ -10,7 +10,7 @@ export default class InformeCModel {
             f.id_factura AS id,
             f.fecha_factura,
             f.id_factura AS numero_factura,
-            f.valor_neto_factura AS valor_pago,
+            t.valor_transaccion AS valor_pago,
             t.entidad_bancaria AS banco_pago,
             t.fecha_transaccion AS fecha_pago,
             t.estado_transaccion AS estado_pago,
