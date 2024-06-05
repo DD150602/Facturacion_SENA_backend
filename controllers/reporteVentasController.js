@@ -18,5 +18,15 @@ export default class ReporteVentasController {
     if (response instanceof Error) return res.status(500).json({ message: 'Error interno en el servidor' })
 
     return res.json(response)
-  };
+  }
+
+  static async getInfoForCollectReport (req, res) {
+    const { id } = req.params
+    const { month = null, day = null } = req.query
+    const response = await ReporteVentasModel.getInfoForCollectReport({ id, input: { month, day } })
+    if (response instanceof NoData) return res.status(404).json({ message: 'No se han encontrado datos para cargar.' })
+    if (response instanceof Error) return res.status(500).json({ message: 'Error interno en el servidor' })
+
+    return res.json(response)
+  }
 }

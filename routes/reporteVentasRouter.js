@@ -5,5 +5,6 @@ const repoteVentasRouter = Router()
 
 repoteVentasRouter.get('/', ReporteVentasController.getAll)
 repoteVentasRouter.get('/:id', ReporteVentasController.getInfoForReport)
+repoteVentasRouter.get('/collect/:id', ReporteVentasController.getInfoForCollectReport)
 
 export default repoteVentasRouter

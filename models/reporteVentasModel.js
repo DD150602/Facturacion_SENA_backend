@@ -55,4 +55,36 @@ export default class ReporteVentasModel {
       return error
     }
   }
+
+  static async getInfoForCollectReport ({ id, input }) {
+    try {
+      const { month = null, day = null } = input
+      let query = `SELECT entidad_bancaria, fecha_transaccion, estado_transaccion, valor_transaccion,(SELECT SUM(valor_transaccion) FROM transacciones) as total_transacciones, BIN_TO_UUID(id_transaccion) id, CONCAT_WS(' ', primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario) AS nombre_usuario, descripcion_transaccion, transacciones.id_factura
+      FROM transacciones
+      INNER JOIN usuarios ON transacciones.id_usuario = usuarios.id_usuario
+      INNER JOIN facturas ON transacciones.id_factura = facturas.id_factura
+      INNER JOIN tipo_transaccion ON transacciones.id_tipo_transaccion = tipo_transaccion.id_tipo_transaccion
+      WHERE transacciones.id_usuario = UUID_TO_BIN(?)`
+
+      const params = [id]
+      if (month && day) {
+        query += ' AND MONTH(transacciones.fecha_transaccion) = ? AND DAY(transacciones.fecha_transaccion) = ?'
+        params.push(month, day)
+      } else if (month) {
+        query += ' AND MONTH(transacciones.fecha_transaccion) = ?'
+        params.push(month)
+      } else if (day) {
+        query += ' AND DAY(transacciones.fecha_transaccion) = ?'
+        params.push(day)
+      }
+      const [infoTransactions] = await db.query(query, params)
+
+      if (!infoTransactions) throw new NoData()
+      if (infoTransactions.length === 0) throw new NoData()
+
+      return infoTransactions
+    } catch (error) {
+      return error
+    }
+  }
 }
