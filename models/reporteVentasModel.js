@@ -70,7 +70,13 @@ export default class ReporteVentasModel {
   static async getInfoForCollectReport ({ id, input }) {
     try {
       const { month = null, day = null } = input
-      let query = `SELECT entidad_bancaria, fecha_transaccion, estado_transaccion, valor_transaccion,(SELECT SUM(valor_transaccion) FROM transacciones) as total_transacciones, BIN_TO_UUID(id_transaccion) id, CONCAT_WS(' ', primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario) AS nombre_usuario, descripcion_transaccion, transacciones.id_factura
+
+      const [[totalTransacciones]] = await db.query(
+        'SELECT SUM(valor_transaccion) AS total_transacciones FROM transacciones WHERE transacciones.id_usuario = UUID_TO_BIN(?)',
+        [id]
+      )
+
+      let query = `SELECT entidad_bancaria, fecha_transaccion, estado_transaccion, valor_transaccion, BIN_TO_UUID(id_transaccion) id, CONCAT_WS(' ', primer_nombre_usuario, segundo_nombre_usuario, primer_apellido_usuario, segundo_apellido_usuario) AS nombre_usuario, descripcion_transaccion, transacciones.id_factura
       FROM transacciones
       INNER JOIN usuarios ON transacciones.id_usuario = usuarios.id_usuario
       INNER JOIN facturas ON transacciones.id_factura = facturas.id_factura
@@ -93,7 +99,7 @@ export default class ReporteVentasModel {
       if (!infoTransactions) throw new NoData()
       if (infoTransactions.length === 0) throw new NoData()
 
-      return infoTransactions
+      return { infoTransactions, totalTransacciones: totalTransacciones.total_transacciones }
     } catch (error) {
       return error
     }
