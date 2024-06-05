@@ -4,25 +4,44 @@ import { NoData, DuplicateInfo, InfoAlreadyExisting } from '../schemas/errorSche
 export default class gestionCModel {
     static async getAllClientes() {
         try {
-            const [clientes] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, 
-                correo_cliente,
-                link_foto_cliente,
-                numero_documento_cliente,
-                primer_nombre_cliente,
-                segundo_nombre_cliente,
-                primer_apellido_cliente,
-                segundo_apellido_cliente,
-                telefono_cliente,
-                direccion_cliente
-                FROM clientes`);
+            const [clientes] = await db.query(`
+                SELECT 
+                    BIN_TO_UUID(c.id_cliente) AS id,
+                    c.correo_cliente,
+                    c.link_foto_cliente,
+                    c.numero_documento_cliente,
+                    c.primer_nombre_cliente,
+                    c.segundo_nombre_cliente,
+                    c.primer_apellido_cliente,
+                    c.segundo_apellido_cliente,
+                    c.telefono_cliente,
+                    c.direccion_cliente,
+                    IFNULL(SUM(f.valor_neto_factura - f.pago_recibido), 1) AS deuda_total
+                FROM 
+                    clientes c
+                LEFT JOIN 
+                    facturas f ON c.id_cliente = f.id_cliente AND f.estado = 1
+                GROUP BY 
+                    c.id_cliente, 
+                    c.correo_cliente, 
+                    c.link_foto_cliente, 
+                    c.numero_documento_cliente, 
+                    c.primer_nombre_cliente, 
+                    c.segundo_nombre_cliente, 
+                    c.primer_apellido_cliente, 
+                    c.segundo_apellido_cliente, 
+                    c.telefono_cliente, 
+                    c.direccion_cliente
+            `);
 
             if (!clientes) throw new NoData();
             if (clientes.length === 0) throw new NoData();
-            return (clientes);
+            return clientes;
         } catch (error) {
             console.error("Error al traer los clientes:", error);
         }
     }
+
 
     static async getAllComprasById(id, mes = null, year = null) {
         try {
@@ -32,6 +51,7 @@ export default class gestionCModel {
                 f.fecha_factura,
                 f.valor_bruto_factura,
                 f.valor_neto_factura,
+                f.pago_recibido,
                 p.id_producto as id_producto,
                 p.nombre_producto as nombre_producto,
                 p.descripcion_producto as descripcion_producto,
@@ -82,6 +102,7 @@ export default class gestionCModel {
                         fecha_factura: curr.fecha_factura,
                         valor_bruto_factura: curr.valor_bruto_factura,
                         valor_neto_factura: curr.valor_neto_factura,
+                        pago_recibido: curr.pago_recibido,
                         productos: [{
                             id_producto: curr.id_producto,
                             nombre_producto: curr.nombre_producto,
@@ -100,10 +121,6 @@ export default class gestionCModel {
             return error;
         }
     }
-
-
-
-
 
     static async updateClienteById({ id, input }) {
         try {
