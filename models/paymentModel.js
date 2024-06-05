@@ -13,7 +13,6 @@ export class PaymentModel {
       if (data.length === 0) throw new NoData()
       return data
     } catch (error) {
-      console.log(error)
       return error
     }
   }
@@ -73,7 +72,6 @@ export class PaymentModel {
       return 'Abono generado satisfactoriamente'
     } catch (error) {
       await db.rollback()
-      console.log(error)
       return error
     }
   }

@@ -40,8 +40,7 @@ export default class gestionCModel {
         } catch (error) {
             console.error("Error al traer los clientes:", error);
         }
-    }
-
+  }
 
     static async getAllComprasById(id, mes = null, year = null) {
         try {
@@ -66,8 +65,7 @@ export default class gestionCModel {
             JOIN 
                 clientes c ON f.id_cliente = c.id_cliente
             WHERE 
-                c.id_cliente = UUID_TO_BIN(?)
-            `;
+                c.id_cliente = UUID_TO_BIN(?)`
 
             const params = [id];
             if (mes && year) {
@@ -128,27 +126,26 @@ export default class gestionCModel {
                 correo_cliente,
             } = input;
 
-            const [verifyEmail] = await db.query(`
+      const [verifyEmail] = await db.query(`
                 SELECT BIN_TO_UUID(id_cliente) id, correo_cliente
                 FROM clientes
                 WHERE correo_cliente = ? AND id_cliente != UUID_TO_BIN(?)
-            `, [correo_cliente, id]);
+            `, [correo_cliente, id])
 
-            if (verifyEmail.length > 0) throw new DuplicateInfo();
+      if (verifyEmail.length > 0) throw new DuplicateInfo()
 
+      const [update] = await db.query('UPDATE clientes SET ? WHERE id_cliente = UUID_TO_BIN(?)', [input, id])
 
-            const [update] = await db.query(`UPDATE clientes SET ? WHERE id_cliente = UUID_TO_BIN(?)`, [input, id]);
-
-            return update;
-        } catch (error) {
-            console.error(error);
-            return error;
-        }
+      return update
+    } catch (error) {
+      console.error(error)
+      return error
     }
+  }
 
-    static async getClienteById(id) {
-        try {
-            const [cliente] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, 
+  static async getClienteById (id) {
+    try {
+      const [cliente] = await db.query(`SELECT BIN_TO_UUID(id_cliente) id, 
                 correo_cliente,
                 link_foto_cliente,
                 numero_documento_cliente,
@@ -159,13 +156,13 @@ export default class gestionCModel {
                 telefono_cliente,
                 direccion_cliente
                 FROM clientes
-                WHERE id_cliente = UUID_TO_BIN(?)`, [id]);
-            if (!cliente) throw new NoData();
-            if (cliente.length === 0) throw new NoData();
-            return (cliente);
-        } catch (error) {
-            console.error("Error al traer el cliente:", error);
-            return error;
-        }
+                WHERE id_cliente = UUID_TO_BIN(?)`, [id])
+      if (!cliente) throw new NoData()
+      if (cliente.length === 0) throw new NoData()
+      return (cliente)
+    } catch (error) {
+      console.error('Error al traer el cliente:', error)
+      return error
     }
+  }
 }

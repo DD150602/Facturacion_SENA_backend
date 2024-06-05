@@ -39,7 +39,6 @@ export class UserModel {
       if (result.length === 0) throw new NoData()
       return result
     } catch (err) {
-      console.log(err)
       return err
     }
   }
@@ -88,7 +87,6 @@ export class UserModel {
       [primerNombreUsuario, segundoNombreUsuario, primerApellidoUsuario, segundoApellidoUsuario, correoUsuario, numeroDocumentoUsuario, idGenero, linkFoto, telefonoUsuario, direccionUsuario, fechaNacimientoUsuario, id])
       return res
     } catch (err) {
-      console.log(err)
       return err
     }
   }
@@ -125,7 +123,6 @@ export class UserModel {
       return res
     } catch (err) {
       await db.rollback()
-      console.log(err)
       return err
     }
   }

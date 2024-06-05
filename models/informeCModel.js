@@ -1,5 +1,5 @@
-import db from "../config/database.js";
-import { NoData } from "../schemas/errorSchema.js";
+import db from '../config/database.js'
+import { NoData } from '../schemas/errorSchema.js'
 
 export default class InformeCModel {
     static async getInformesCobros(id, mes = null, year = null) {
@@ -38,14 +38,13 @@ export default class InformeCModel {
                 params.push(year);
             }
 
-            const [informe] = await db.query(query, params);
+      const [informe] = await db.query(query, params)
 
-            if (!informe || informe.length === 0) throw new NoData();
+      if (!informe || informe.length === 0) throw new NoData()
 
-            return informe;
-        } catch (error) {
-            console.log(error);
-            return error;
-        }
+      return informe
+    } catch (error) {
+      return error
     }
+  }
 }

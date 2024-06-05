@@ -38,7 +38,6 @@ export class ClientModel {
       `, [correoClient, idGenero, numeroDocumentoClient, primerNombreClient, segundoNombreClient, primerApellidoClient, segundoApellidoClient, telefonoClient, direccionClient, linkFoto, idZona])
       return cliente
     } catch (err) {
-      console.log(err)
       return err
     }
   }

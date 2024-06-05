@@ -76,7 +76,6 @@ export class InvoiceModel {
       return result[0].codigo_secundario
     } catch (err) {
       await db.rollback()
-      console.log(err)
       return err
     }
   }

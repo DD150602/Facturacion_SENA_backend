@@ -37,7 +37,6 @@ export default class ProductController {
     if (!result.success) return res.status(400).json({ objectError: result.error.errors })
 
     const { files } = req
-    console.log(files)
     if (files) result.data.linkFotoProducto = await UploadFilesModel.uploadFiles(files, 'photos_product')
     if (result.data.linkFoto instanceof Error) return res.status(500).json({ message: 'Error interno del servidor ' })
 
