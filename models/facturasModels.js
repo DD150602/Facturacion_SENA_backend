@@ -45,7 +45,7 @@ export class InvoiceModel {
   }
 
   static async createInvoice (input) {
-    const { valorBrutoFactura, valorNetoFactura, cantidadCuotasFactura, fechaProximoPago, idUsuario, idCliente, idTipoCuota, productosFacturas } = input
+    const { valorBrutoFactura, valorNetoFactura, idUsuario, idCliente, productosFacturas } = input
     try {
       await db.beginTransaction()
       // Declara la variable de salida
@@ -56,9 +56,9 @@ export class InvoiceModel {
       // Obtén el valor de la variable de salida
       const [result] = await db.query('SELECT @codigo_secundario AS codigo_secundario;')
       const [invoice] = await db.query(`
-        INSERT INTO facturas (id_factura, valor_bruto_factura, valor_neto_factura, cantidad_cuotas_factura, fecha_proximo_pago, id_usuario, estado, id_cliente, id_tipo_cuota) 
-        VALUES (?, ?, ?, ?, ?, UUID_TO_BIN(?), 1, UUID_TO_BIN(?), ?);
-      `, [result[0].codigo_secundario, valorBrutoFactura, valorNetoFactura, cantidadCuotasFactura, fechaProximoPago, idUsuario, idCliente, idTipoCuota])
+        INSERT INTO facturas (id_factura, valor_bruto_factura, valor_neto_factura, id_usuario, estado, id_cliente, pago_recibido) 
+        VALUES (?, ?, ?, UUID_TO_BIN(?), 1, UUID_TO_BIN(?), 0);
+      `, [result[0].codigo_secundario, valorBrutoFactura, valorNetoFactura, idUsuario, idCliente])
 
       for (const factura of productosFacturas) {
         await db.query(
@@ -82,8 +82,6 @@ export class InvoiceModel {
       nombreUsuario,
       apellidoUsuario,
       valorNetoFactura,
-      cantidadCuotasFactura,
-      fechaProximoPago,
       productosFacturas
     } = input
 
@@ -111,8 +109,6 @@ export class InvoiceModel {
     doc.fontSize(12).text('Empresa: FTM').moveDown()
     doc.text(`Nombre del cliente: ${nombreUsuario} ${apellidoUsuario}`).moveDown()
     doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`).moveDown()
-    doc.text(`Fecha de Próximo Pago: ${fechaProximoPago}`).moveDown()
-    doc.text(`Cantidad de Cuotas: ${cantidadCuotasFactura}`).moveDown()
     doc.moveDown()
     doc.fontSize(16).text('Detalles de los Productos:', { underline: true }).moveDown()
     doc.fontSize(12)
