@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename)
 const uploadPath = path.join(__dirname, '../certificados/DigiCertGlobalRootCA.crt.pem')
 import 'dotenv/config'
 
-const DEFAULT_CONFIG = {
+const CONNECTION_STRING = {
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
   port: process.env.DATABASE_PORT,
