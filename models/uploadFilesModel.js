@@ -25,6 +25,7 @@ export class UploadFilesModel {
       if (fs.existsSync(uploadPath)) {
         fs.unlinkSync(uploadPath)
       }
+      console.log(error)
       return error
     }
   }
