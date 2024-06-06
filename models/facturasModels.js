@@ -3,6 +3,11 @@ import { NoData } from '../schemas/errorSchema.js'
 import transporter from '../config/connectionEmail.js'
 import PDFDocument from 'pdfkit'
 import fs from 'fs'
+import { fileURLToPath } from 'url'
+import path from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export class InvoiceModel {
   static async getAll () {
@@ -45,7 +50,7 @@ export class InvoiceModel {
   }
 
   static async createInvoice (input) {
-    const { valorBrutoFactura, valorNetoFactura, cantidadCuotasFactura, fechaProximoPago, idUsuario, idCliente, idTipoCuota, productosFacturas } = input
+    const { valorBrutoFactura, valorNetoFactura, idUsuario, idCliente, productosFacturas } = input
     try {
       await db.beginTransaction()
       // Declara la variable de salida
@@ -55,10 +60,10 @@ export class InvoiceModel {
       await db.query('CALL sp_Generar_Codigo(@codigo_secundario);')
       // Obtén el valor de la variable de salida
       const [result] = await db.query('SELECT @codigo_secundario AS codigo_secundario;')
-      const [invoice] = await db.query(`
-        INSERT INTO facturas (id_factura, valor_bruto_factura, valor_neto_factura, cantidad_cuotas_factura, fecha_proximo_pago, id_usuario, estado, id_cliente, id_tipo_cuota) 
-        VALUES (?, ?, ?, ?, ?, UUID_TO_BIN(?), 1, UUID_TO_BIN(?), ?);
-      `, [result[0].codigo_secundario, valorBrutoFactura, valorNetoFactura, cantidadCuotasFactura, fechaProximoPago, idUsuario, idCliente, idTipoCuota])
+      await db.query(`
+        INSERT INTO facturas (id_factura, valor_bruto_factura, valor_neto_factura, id_usuario, estado, id_cliente, pago_recibido) 
+        VALUES (?, ?, ?, UUID_TO_BIN(?), 1, UUID_TO_BIN(?), 0);
+      `, [result[0].codigo_secundario, valorBrutoFactura, valorNetoFactura, idUsuario, idCliente])
 
       for (const factura of productosFacturas) {
         await db.query(
@@ -68,69 +73,24 @@ export class InvoiceModel {
         )
       }
       await db.commit()
-      return invoice
+      return result[0].codigo_secundario
     } catch (err) {
       await db.rollback()
       return err
     }
   }
 
-  static async sendFactura (input) {
+  static async sendFactura (input, files) {
     const {
       correoUsuario,
       nombreUsuario,
-      apellidoUsuario,
-      valorNetoFactura,
-      cantidadCuotasFactura,
-      fechaProximoPago,
-      productosFacturas
+      apellidoUsuario
     } = input
-
-    // Crear un nuevo documento PDF con márgenes
-    const doc = new PDFDocument({ margin: 50 })
-    doc.pipe(fs.createWriteStream('factura.pdf'))
-
-    // Establecer colores y estilos
-    const primaryColor = '#1E88E5' // Azul oscuro
-    const textColor = '#333333'
-
-    // Encabezado
-    doc.rect(0, 0, 612, 100).fill(primaryColor)
     try {
-      doc.image('logo.png', 50, 25, { width: 50 })
-    } catch (e) {
-      console.log('Logo not found, skipping logo addition')
-    }
-    doc.fillColor('#FFFFFF').fontSize(24).text('FTM', 110, 40)
-    doc.moveDown(3) // Añadir más espacio después del encabezado
-
-    // Contenido principal
-    doc.fillColor(textColor)
-    doc.fontSize(20).text('Factura', { align: 'center' }).moveDown()
-    doc.fontSize(12).text('Empresa: FTM').moveDown()
-    doc.text(`Nombre del cliente: ${nombreUsuario} ${apellidoUsuario}`).moveDown()
-    doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`).moveDown()
-    doc.text(`Fecha de Próximo Pago: ${fechaProximoPago}`).moveDown()
-    doc.text(`Cantidad de Cuotas: ${cantidadCuotasFactura}`).moveDown()
-    doc.moveDown()
-    doc.fontSize(16).text('Detalles de los Productos:', { underline: true }).moveDown()
-    doc.fontSize(12)
-
-    productosFacturas.forEach(producto => {
-      doc.text(`- ${producto.nombre}:`, { continued: true })
-        .text(` Cantidad: ${producto.cantidad},`, { continued: true })
-        .text(` Precio: $${producto.precio.toFixed(2)}`, { align: 'right' })
-      doc.moveDown()
-    })
-
-    doc.moveDown()
-    doc.fontSize(14).text(`Valor Neto de la Factura: $${valorNetoFactura.toFixed(2)}`, { align: 'right' }).moveDown()
-
-    // Finalizar el documento PDF
-    doc.end()
-
-    // Enviar el correo electrónico con el PDF adjunto
-    try {
+      const { archivo } = files
+      const timestamp = Date.now()
+      const uploadPath = path.join(__dirname, '../temp', `${timestamp}_${archivo.name}`)
+      await archivo.mv(uploadPath)
       const mailOptions = {
         from: 'ftmEnvios@ftm.com',
         to: `${correoUsuario}`,
@@ -174,24 +134,30 @@ export class InvoiceModel {
           `,
         attachments: [
           {
-            filename: 'factura.pdf',
-            path: 'factura.pdf'
+            filename: archivo.name,
+            path: uploadPath
           }
         ]
       }
 
       transporter.sendMail(mailOptions, function (error, info) {
+        fs.unlinkSync(uploadPath)
         if (error) {
           return error
         } else {
-          console.log('Correo electrónico enviado: ' + info.response)
+          console.log('Correo electronico enviado: ' + info.response)
         }
       })
     } catch (error) {
+      const { archivo } = files
+      const uploadPath = path.join(__dirname, '../temp', `${Date.now()}_${archivo.name}`)
+      if (fs.existsSync(uploadPath)) {
+        fs.unlinkSync(uploadPath)
+      }
       return error
     }
   }
-
+  
   static async getAllProducts () {
     try {
       const [res] = await db.query(

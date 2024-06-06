@@ -11,18 +11,21 @@ export class UploadFilesModel {
   static async uploadFiles (files, dir) {
     try {
       const { archivo } = files
-      const uploadPath = path.join(__dirname, '../temp', archivo.name)
+      const timestamp = Date.now()
+      const uploadPath = path.join(__dirname, '../temp', `${timestamp}_${archivo.name}`)
       await archivo.mv(uploadPath)
-      const storageRef = ref(storage, `${dir}/${Date.now()}${archivo.name}`)
+      const storageRef = ref(storage, `${dir}/${timestamp}_${archivo.name}`)
       await uploadBytes(storageRef, fs.readFileSync(uploadPath))
       const downloadURL = await getDownloadURL(storageRef)
       fs.unlinkSync(uploadPath)
       return downloadURL
     } catch (error) {
       const { archivo } = files
-      const uploadPath = path.join(__dirname, '../temp', archivo.name)
-      fs.unlinkSync(uploadPath)
-      return (error)
+      const uploadPath = path.join(__dirname, '../temp', `${Date.now()}${archivo.name}`)
+      if (fs.existsSync(uploadPath)) {
+        fs.unlinkSync(uploadPath)
+      }
+      return error
     }
   }
 }

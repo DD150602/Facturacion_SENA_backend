@@ -10,19 +10,16 @@ const UserSchemaById = z.object({
 const createInvoiceSchema = z.object({
   valorBrutoFactura: z.number({ message: 'El valor bruto de la factura no es valido.' })
     .positive({ message: 'El valor bruto de la factura debe ser positivo.' }),
+
   valorNetoFactura: z.number({ message: 'El valor neto de la factura no es valido.' })
     .positive({ message: 'El valor neto de la factura debe ser positivo.' }),
-  cantidadCuotasFactura: z.number({ message: 'La cantidad de cuotas no es valida.' })
-    .int({ message: 'La cantidad de cuotas debe ser un número entero.' })
-    .positive({ message: 'La cantidad de cuotas debe ser positiva.' }),
-  fechaProximoPago: z.string({ message: 'La fecha del próximo pago no es valida.' }),
+
   idUsuario: z.string({ message: 'El ID del usuario no es valido.' })
     .uuid({ message: 'No se ha proporcionado un ID de usuario valido.' }),
+
   idCliente: z.string({ message: 'El ID del cliente no es valido.' })
     .uuid({ message: 'No se ha proporcionado un ID de cliente valido.' }),
-  idTipoCuota: z.number({ message: 'El ID del tipo de cuota no es valido.' })
-    .int({ message: 'El ID del tipo de cuota debe ser un número entero.' })
-    .positive({ message: 'El ID del tipo de cuota debe ser positivo.' }),
+
   productosFacturas: z.array(z.object({
     id: z.number({ message: 'No se ha proporcionado un ID de producto valido.' })
       .positive({ message: 'El ID del producto enviado no es valido.' }),
