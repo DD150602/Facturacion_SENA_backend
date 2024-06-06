@@ -88,7 +88,8 @@ export class InvoiceModel {
     } = input
     try {
       const { archivo } = files
-      const uploadPath = path.join(__dirname, '../temp', archivo.name)
+      const timestamp = Date.now()
+      const uploadPath = path.join(__dirname, '../temp', `${timestamp}_${archivo.name}`)
       await archivo.mv(uploadPath)
       const mailOptions = {
         from: 'ftmEnvios@ftm.com',
@@ -144,17 +145,19 @@ export class InvoiceModel {
         if (error) {
           return error
         } else {
-          console.log('Correo electrónico enviado: ' + info.response)
+          console.log('Correo electronico enviado: ' + info.response)
         }
       })
     } catch (error) {
       const { archivo } = files
-      const uploadPath = path.join(__dirname, '../temp', archivo.name)
-      fs.unlinkSync(uploadPath)
-      return (error)
+      const uploadPath = path.join(__dirname, '../temp', `${Date.now()}_${archivo.name}`)
+      if (fs.existsSync(uploadPath)) {
+        fs.unlinkSync(uploadPath)
+      }
+      return error
     }
   }
-
+  
   static async getAllProducts () {
     try {
       const [res] = await db.query(
