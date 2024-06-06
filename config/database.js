@@ -19,6 +19,7 @@ const CONNECTION_STRING = {
 let db
 
 try {
+  console.log(CONNECTION_STRING)
   db = await mysql2.createConnection(CONNECTION_STRING)
   console.log('conectado con exito')
 } catch (error) {
