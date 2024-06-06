@@ -22,6 +22,7 @@ try {
   db = await mysql2.createConnection(CONNECTION_STRING)
   console.log('conectado con exito')
 } catch (error) {
+  console.log(error)
   console.log('no se pudo conectar')
 }
 
