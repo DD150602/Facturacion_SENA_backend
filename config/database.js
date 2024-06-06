@@ -6,13 +6,14 @@ import path from 'path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const uploadPath = path.join(__dirname, '../certificados/DigiCertGlobalRootCA.crt.pem')
+import 'dotenv/config'
 
-const CONNECTION_STRING = {
-  host: DATABASE_HOST,
-  user: DATABASE_USER,
-  port: DATABASE_PORT,
-  password: DATABASE_PASSWORD,
-  database: DATABASE_NAME,
+const DEFAULT_CONFIG = {
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USER,
+  port: process.env.DATABASE_PORT,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
   ssl: { ca: fs.readFileSync(uploadPath) }
 }
 
