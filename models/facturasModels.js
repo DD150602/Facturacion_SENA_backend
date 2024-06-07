@@ -1,13 +1,6 @@
 import db from '../config/database.js'
 import { NoData } from '../schemas/errorSchema.js'
 import transporter from '../config/connectionEmail.js'
-import PDFDocument from 'pdfkit'
-import fs from 'fs'
-import { fileURLToPath } from 'url'
-import path from 'path'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 export class InvoiceModel {
   static async getAll () {
@@ -88,9 +81,6 @@ export class InvoiceModel {
     } = input
     try {
       const { archivo } = files
-      const timestamp = Date.now()
-      const uploadPath = path.join(__dirname, '../temp', `${timestamp}_${archivo.name}`)
-      await archivo.mv(uploadPath)
       const mailOptions = {
         from: 'ftmEnvios@ftm.com',
         to: `${correoUsuario}`,
@@ -135,29 +125,23 @@ export class InvoiceModel {
         attachments: [
           {
             filename: archivo.name,
-            path: uploadPath
+            content: archivo.data
           }
         ]
       }
 
       transporter.sendMail(mailOptions, function (error, info) {
-        fs.unlinkSync(uploadPath)
         if (error) {
           return error
         } else {
-          console.log('Correo electronico enviado: ' + info.response)
+          console.log('Correo electrónico enviado: ' + info.response)
         }
       })
     } catch (error) {
-      const { archivo } = files
-      const uploadPath = path.join(__dirname, '../temp', `${Date.now()}_${archivo.name}`)
-      if (fs.existsSync(uploadPath)) {
-        fs.unlinkSync(uploadPath)
-      }
       return error
     }
   }
-  
+
   static async getAllProducts () {
     try {
       const [res] = await db.query(
