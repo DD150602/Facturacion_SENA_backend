@@ -2,7 +2,9 @@ import cors from 'cors'
 
 const ACCPEPTED_ORIGINS = [
   'http://localhost:3000',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'https://dwb-archivos.web.app',
+  'https://dwb-archivos.firebaseapp.com'
 ]
 
 export default function corsMiddleware ({ acceptedOrigins = ACCPEPTED_ORIGINS } = {}) {
