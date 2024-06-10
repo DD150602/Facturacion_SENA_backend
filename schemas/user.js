@@ -79,18 +79,18 @@ const UserDeleteSchema = z.object({
   idUserRemplazo: z.string({ message: 'El dato enviado no es valido.' }).uuid({ message: 'No se ha proporcionado un ID valido.' })
 })
 
-export function validateUserById(input) {
+export function validateUserById (input) {
   return UserSchemaById.safeParse(input)
 }
 
-export function validateUserDataCreate(input) {
+export function validateUserDataCreate (input) {
   return userCreateSchema.safeParse(input)
 }
 
-export function validateUserDataUpdate(input) {
+export function validateUserDataUpdate (input) {
   return userUpdateSchema.safeParse(input)
 }
 
-export function validateUserDelete(input) {
+export function validateUserDelete (input) {
   return UserDeleteSchema.safeParse(input)
 }

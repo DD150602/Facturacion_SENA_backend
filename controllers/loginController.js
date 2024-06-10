@@ -12,6 +12,7 @@ class AuthController {
         return res.status(400).json({ objectError: validacion.error.errors })
       }
 
+      // eslint-disable-next-line camelcase
       const { correo_usuario, password_usuario } = validacion.data
       const user = await UserModel.getUserByUsername(correo_usuario)
 
