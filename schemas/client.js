@@ -34,10 +34,11 @@ const clientCreateSchema = z.object({
     .min(10, { message: 'El número de telefono del cliente debe tener 10 caracteres.' })
     .max(10, { message: 'El número de telefono del cliente debe tener 10 caracteres.' })
     .refine(value => /^[a-zA-Z0-9]+$/.test(value), { message: 'El número de telefono del cliente no puede contener caracteres especiales.' }),
-  direccionClient: z.string().refine((value) => {
-    const colombianAddressRegex = /^.*\b(calle|carrera|avenida|diagonal|transversal|manzana|mz|avenida carrera|vía)\b.*/gi
-    return colombianAddressRegex.test(value)
-  }, 'La direccion tiene un formato invalido'),
+  direccionClient: z.string()
+    .refine((value) => {
+      const colombianAddressRegex = /^.*\b(calle|carrera|avenida|diagonal|transversal|manzana|mz|avenida carrera|vía)\b.*/gi
+      return colombianAddressRegex.test(value)
+    }, 'La direccion debe tener un formato como: calle 123, carrera 123, avenida 123, diagonal 123, etc.'),
   linkFoto: z.string().optional(),
   idZona: z.string({ message: 'El ID de zona enviado no es valido.' }).min(1, { message: 'El valor ID de zona no puede estar vacio.' }).uuid({ message: 'No se ha proporcionado un ID de zona valido.' })
 })
